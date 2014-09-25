@@ -1,5 +1,6 @@
 #include "hades/transaction.hpp"
 
+#include <cassert>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -54,8 +55,11 @@ void hades::transaction::rollback()
     if(m_released)
         throw std::runtime_error("Savepoint already released");
 
-    if(m_connection.transaction_depth() == 0)
+    if(m_connection.transaction_depth() < 2)
+    {
+        assert(m_connection.transaction_depth() == 1);
         devoid("ROLLBACK TRANSACTION", empty_row(), m_connection);
+    }
     else
         devoid(
             mkstr() << "ROLLBACK TO SAVEPOINT " <<

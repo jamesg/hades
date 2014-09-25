@@ -6,7 +6,7 @@
 #include "styx/object_accessor.hpp"
 
 #include "compound_id.hpp"
-#include "has_key.hpp"
+#include "detail/has_key_attr.hpp"
 
 namespace hades
 {
@@ -21,7 +21,7 @@ namespace hades
      */
     template<const char *...Attributes>
     class has_candidate_key :
-        public virtual detail::has_key<Attributes>...,
+        public virtual detail::has_key_attr<Attributes>...,
         public virtual styx::object_accessor
     {
         public:

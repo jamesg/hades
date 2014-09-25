@@ -7,9 +7,9 @@
 #include "styx/styx.hpp"
 #include "styx/object_accessor.hpp"
 
-#include "attribute_list.hpp"
-#include "has_key.hpp"
-#include "retrieve_values.hpp"
+#include "hades/attribute_list.hpp"
+#include "hades/detail/has_key_attr.hpp"
+#include "hades/retrieve_values.hpp"
 
 namespace hades
 {
@@ -20,7 +20,7 @@ namespace hades
          */
         template<const char *...Keys>
         class compound_id_map :
-            public detail::has_key<Keys>...,
+            public detail::has_key_attr<Keys>...,
             public attribute_list<Keys...>,
             public virtual styx::object_accessor
         {
@@ -30,7 +30,7 @@ namespace hades
             }
 
             compound_id_map(styx::element& o) :
-                detail::has_key<Keys>(o)...,
+                detail::has_key_attr<Keys>(o)...,
                 styx::object_accessor(o)
             {
             }

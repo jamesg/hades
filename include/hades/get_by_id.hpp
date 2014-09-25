@@ -8,7 +8,7 @@
 #include "hades/bind_values.hpp"
 #include "hades/compound_id.hpp"
 #include "hades/connection.hpp"
-#include "hades/has_key.hpp"
+//#include "hades/detail/has_key_attr.hpp"
 #include "hades/retrieve_values.hpp"
 
 namespace hades
@@ -43,6 +43,9 @@ namespace hades
         oss << " FROM " << Out::relation_name;
         oss << " WHERE ";
         Out::id_type::key_where_clause(oss);
+#ifdef HADES_ENABLE_DEBUGGING
+        std::cerr << "hades get_by_id query: " << oss. str() << std::endl;
+#endif
 
         sqlite3_stmt *stmt = nullptr;
         if(
