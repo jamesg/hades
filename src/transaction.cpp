@@ -54,8 +54,6 @@ void hades::transaction::rollback()
     if(m_released)
         throw std::runtime_error("Savepoint already released");
 
-    m_connection.finish_transaction();
-
     if(m_connection.transaction_depth() == 0)
         devoid("ROLLBACK TRANSACTION", empty_row(), m_connection);
     else
@@ -65,6 +63,8 @@ void hades::transaction::rollback()
             empty_row(),
             m_connection
             );
+
+    m_connection.finish_transaction();
 }
 
 hades::transaction::~transaction()

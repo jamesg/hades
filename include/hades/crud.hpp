@@ -31,12 +31,9 @@ namespace hades
             // Permanent storage functions.
             //
 
-            static styx::list get_collection(
-                    hades::connection& conn,
-                    const std::string& where="1"
-                    )
+            static styx::list get_collection(hades::connection& conn)
             {
-                return hades::get_collection<Tuple>(conn, where);
+                return hades::get_collection<Tuple>(conn);
             }
 
             /*!
