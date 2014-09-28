@@ -55,6 +55,13 @@ namespace hades
         public virtual styx::object_accessor
     {
         public:
+            tuple()
+            {
+            }
+            tuple(const styx::element& e) :
+                styx::object_accessor(e)
+            {
+            }
             /*!
              * \brief Extend this tuple type by appending one attribute to the
              * list of attributes.
