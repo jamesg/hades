@@ -151,6 +151,11 @@ namespace hades
                 bind_set_values_<Start, Attributes...>(stmt);
             }
 
+            bool operator<(const tuple<Attributes...>& o) const
+            {
+                return attribute_list<Attributes...>::less_than(*this, o);
+            }
+
         private:
             /*!
              * \brief Get a reference to one of the attributes in the

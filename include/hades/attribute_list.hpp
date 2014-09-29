@@ -101,6 +101,14 @@ namespace hades
             return all_attributes_set_<Attributes...>(obj);
         }
 
+        static bool less_than(
+                const styx::object_accessor& x,
+                const styx::object_accessor& y
+                )
+        {
+            return less_than_<Attributes...>(x, y);
+        }
+
     private:
         template<const char *Attr1, const char *Attr2, const char *...Attrs>
         static void column_list_(std::ostream& os)
@@ -216,6 +224,26 @@ namespace hades
         {
             return all_attributes_set_<Attr1>(obj) &&
                 all_attributes_set_<Attr2, Attrs...>(obj);
+        }
+
+        template<const char *Attr1>
+        static bool less_than_(
+                const styx::object_accessor& x,
+                const styx::object_accessor& y
+                )
+        {
+            return x.copy_string(Attr1) < y.copy_string(Attr1);
+        }
+
+        template<const char *Attr1, const char *Attr2, const char *...Attrs>
+        static bool less_than_(
+                const styx::object_accessor& x,
+                const styx::object_accessor& y
+                )
+        {
+            if(less_than_<Attr1>(x, y))
+                return true;
+            return less_than_<Attr2, Attrs...>(x, y);
         }
     };
 
