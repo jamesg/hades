@@ -36,7 +36,7 @@ namespace
 
         int& site_id()
         {
-            return key<attribute::site_id>();
+            return get_int<attribute::site_id>();
         }
 
         std::string& name()

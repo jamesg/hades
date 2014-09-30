@@ -155,6 +155,14 @@ namespace hades
             {
                 return attribute_list<Attributes...>::less_than(*this, o);
             }
+            bool operator==(const tuple<Attributes...>& o) const
+            {
+                return attribute_list<Attributes...>::equal(*this, o);
+            }
+            bool operator!=(const tuple<Attributes...>& o) const
+            {
+                return attribute_list<Attributes...>::not_equal(*this, o);
+            }
 
         private:
             /*!

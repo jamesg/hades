@@ -109,6 +109,22 @@ namespace hades
             return less_than_<Attributes...>(x, y);
         }
 
+        static bool equal(
+                const styx::object_accessor& x,
+                const styx::object_accessor& y
+                )
+        {
+            return equal_<Attributes...>(x, y);
+        }
+
+        static bool not_equal(
+                const styx::object_accessor& x,
+                const styx::object_accessor& y
+                )
+        {
+            return not_equal_<Attributes...>(x, y);
+        }
+
     private:
         template<const char *Attr1, const char *Attr2, const char *...Attrs>
         static void column_list_(std::ostream& os)
@@ -244,6 +260,46 @@ namespace hades
             if(less_than_<Attr1>(x, y))
                 return true;
             return less_than_<Attr2, Attrs...>(x, y);
+        }
+
+        template<const char *Attr1>
+        static bool equal_(
+                const styx::object_accessor& x,
+                const styx::object_accessor& y
+                )
+        {
+            return x.copy_string(Attr1) == y.copy_string(Attr1);
+        }
+
+        template<const char *Attr1, const char *Attr2, const char *...Attrs>
+        static bool equal_(
+                const styx::object_accessor& x,
+                const styx::object_accessor& y
+                )
+        {
+            if(equal_<Attr1>(x, y))
+                return true;
+            return equal_<Attr2, Attrs...>(x, y);
+        }
+
+        template<const char *Attr1>
+        static bool not_equal_(
+                const styx::object_accessor& x,
+                const styx::object_accessor& y
+                )
+        {
+            return x.copy_string(Attr1) != y.copy_string(Attr1);
+        }
+
+        template<const char *Attr1, const char *Attr2, const char *...Attrs>
+        static bool not_equal_(
+                const styx::object_accessor& x,
+                const styx::object_accessor& y
+                )
+        {
+            if(not_equal_<Attr1>(x, y))
+                return true;
+            return not_equal_<Attr2, Attrs...>(x, y);
         }
     };
 

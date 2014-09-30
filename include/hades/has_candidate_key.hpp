@@ -53,15 +53,13 @@ namespace hades
 
             id_type id()
             {
-                return id_type(get_element());
+                styx::element el = get_element();
+                return id_type(el);
             }
 
             void set_id(compound_id<Attributes...> key)
             {
-                compound_id<Attributes...>::copy_attributes_from_id_map(
-                        key.id_map(),
-                        *this
-                        );
+                attribute_list<Attributes...>::copy_attributes(key, *this);
             }
 
             template<int Start=1>

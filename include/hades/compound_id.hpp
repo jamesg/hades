@@ -10,40 +10,19 @@
 #include "hades/attribute_list.hpp"
 #include "hades/detail/has_key_attr.hpp"
 #include "hades/retrieve_values.hpp"
+#include "hades/tuple.hpp"
 
 namespace hades
 {
     namespace detail
     {
         /*!
-         * \note Provides storage for the compound_id.
-         */
-        template<const char *...Keys>
-        class compound_id_map :
-            public detail::has_key_attr<Keys>...,
-            public attribute_list<Keys...>,
-            public virtual styx::object_accessor
-        {
-        public:
-            compound_id_map()
-            {
-            }
-
-            compound_id_map(styx::element& o) :
-                detail::has_key_attr<Keys>(o)...,
-                styx::object_accessor(o)
-            {
-            }
-
-            styx::object_accessor& accessor()
-            {
-                return *this;
-            }
-        };
-
-        /*!
-         * \brief Initialise a compound_id_map (specialisation of
-         * styx::object_accessor) with values.
+         * \brief Initialise a styx::object_accessor with values from a
+         * std::initializer_list.
+         *
+         * \param CompoundIdMap A styx::object_accessor derived type which also
+         * inherits from detail::has_key_attr<Attr> for each attribute in the
+         * Keys list.
          */
         template<
                      typename CompoundIdMap,
@@ -59,7 +38,8 @@ namespace hades
         {
             if(i != end)
             {
-                get_key<CompoundIdMap, Key1>(out) = *i;
+                //get_key<CompoundIdMap, Key1>(out) = *i;
+                out.template get_int<Key1>() = *i;
                 copy_id_list<CompoundIdMap, Key2, Keys...>(++i, end, out);
             }
         }
@@ -76,7 +56,8 @@ namespace hades
                 )
         {
             if(i != end)
-                get_key<CompoundIdMap, Key1>(out) = *i;
+                out.template get_int<Key1>() = *i;
+                //get_key<CompoundIdMap, Key1>(out) = *i;
         }
     }
 
@@ -85,23 +66,21 @@ namespace hades
      * that has a candidate key use has_candidate_key instead.
      */
     template<const char *...Keys>
-    class compound_id
+    class compound_id :
+        public hades::tuple<Keys...>/*,*/
+        //public detail::has_key_attr<Keys>...
     {
     public:
-        typedef detail::compound_id_map<Keys...> id_map_type;
-
-        static constexpr const size_t arity = sizeof...(Keys);
-
         template<int Start=0>
         static compound_id<Keys...> from_stmt(sqlite3_stmt *stmt)
         {
-            detail::compound_id_map<Keys...> id;
+            compound_id<Keys...> id;
             // 0 is the first index when retrieving values.
             attribute_list<Keys...>::template retrieve_values<Start>(
                     stmt,
-                    id.accessor()
+                    id
                     );
-            return compound_id<Keys...>(id);
+            return id;
         }
 
         compound_id()
@@ -109,44 +88,27 @@ namespace hades
         }
         compound_id(std::initializer_list<int> values)
         {
-            detail::copy_id_list<detail::compound_id_map<Keys...>, Keys...>(
+            detail::copy_id_list<compound_id<Keys...>, Keys...>(
                     values.begin(),
                     values.end(),
-                    m_map
+                    *this
                     );
         }
-        compound_id(styx::element e) :
-            m_map(e)
+        compound_id(const styx::element& e) :
+            styx::object_accessor(e)
         {
         }
-        compound_id(const compound_id<Keys...>& o) :
-            m_map(o.m_map)
-        {
-        }
-        compound_id(const detail::compound_id_map<Keys...>& map) :
-            m_map(map)
+        compound_id(const compound_id& m) :
+            styx::object_accessor(m.get_element())
         {
         }
 
-        static void copy_attributes_from_id_map(
-                detail::compound_id_map<Keys...> from,
-                styx::object_accessor& to
-                )
-        {
-            copy_attributes_from_id_map_<Keys...>(from, to);
-        }
-
-        template<const char *Key_>
-        int& key()
-        {
-            return detail::get_key<detail::compound_id_map<Keys...>, Key_>(
-                    m_map
-                    );
-        }
-        detail::compound_id_map<Keys...>& id_map()
-        {
-            return m_map;
-        }
+        //template<const char *Key_>
+        //int& key()
+        //{
+            ////return detail::get_key<compound_id<Keys...>, Key_>(*this);
+            //return tuple<Keys...>::template get_int<Key_>();
+        //}
         /*!
          * \brief Bind values of a compound_id to a statement.
          */
@@ -174,18 +136,6 @@ namespace hades
         static void key_column_list(std::ostream& os)
         {
             attribute_list<Keys...>::column_list(os);
-        }
-
-        bool operator==(const compound_id<Keys...>& o) const
-        {
-            compound_id<Keys...> x = *this, y = o;
-            return equal_<Keys...>(x.id_map(), y.id_map());
-        }
-
-        bool operator!=(const compound_id<Keys...>& o) const
-        {
-            compound_id<Keys...> x = *this, y = o;
-            return !equal_<Keys...>(x.id_map(), y.id_map());
         }
     private:
         template<
@@ -220,7 +170,8 @@ namespace hades
         {
             hades::bind(
                 Index,
-                detail::get_key<id_map_type, Attr1>(id.id_map()),
+                id.template get_int<Attr1>(),/*(Attr1),*/
+                //detail::get_key<compound_id<Keys...>, Attr1>(id),
                 stmt
                 );
         }
@@ -238,61 +189,10 @@ namespace hades
         {
             os << Attr1 << " = ? ";
         }
-
-        template<const char *Attr1, const char *Attr2, const char *...Attrs>
-        static void copy_attributes_from_id_map_(
-                detail::compound_id_map<Keys...> from,
-                styx::object_accessor& to
-                )
-        {
-            copy_attributes_from_id_map_<Attr1>(from, to);
-            copy_attributes_from_id_map_<Attr2, Attrs...>(from, to);
-        }
-
-        template<const char *Attr>
-        static void copy_attributes_from_id_map_(
-                detail::compound_id_map<Keys...> from,
-                styx::object_accessor& to
-                )
-        {
-            to.get_element(Attr) = from.get_element(Attr);
-        }
-
-        template<const char *Attr1, const char *Attr2, const char *...Attrs>
-        static bool equal_(
-                detail::compound_id_map<Keys...> x,
-                detail::compound_id_map<Keys...> y
-                )
-        {
-            return equal_<Attr1>(x, y) && equal_<Attr2, Attrs...>(x, y);
-        }
-
-        template<const char *Attr1>
-        static bool equal_(
-                detail::compound_id_map<Keys...> x,
-                detail::compound_id_map<Keys...> y
-                )
-        {
-            // TODO: Don't convert to strings if ids are of the same type to
-            // start.
-            styx::element x_elem = std::string(), y_elem = std::string();
-            return
-                styx::convert(x.get_element(Attr1), x_elem) &&
-                styx::convert(y.get_element(Attr1), y_elem) &&
-                boost::get<std::string>(x_elem) == boost::get<std::string>(y_elem);
-        }
-
-        detail::compound_id_map<Keys...> m_map;
     };
 
     template<>
     void compound_id<>::key_where_clause(std::ostream& os);
-
-    template<>
-    void compound_id<>::copy_attributes_from_id_map(
-            detail::compound_id_map<>,
-            styx::object_accessor&
-            );
 }
 
 #endif

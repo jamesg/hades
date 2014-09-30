@@ -13,16 +13,16 @@ SCENARIO("db::compound_id") {
         hades::compound_id<t1_id, t2_id> id;
 
         WHEN("the first id is set") {
-            id.key<t1_id>() = 1;
+            id.get_int<t1_id>() = 1;
             THEN("the first id was set") {
-                REQUIRE(id.key<t1_id>() == 1);
+                REQUIRE(id.get_int<t1_id>() == 1);
             }
         }
 
         WHEN("the second id is set") {
-            id.key<t2_id>() = 2;
+            id.get_int<t2_id>() = 2;
             THEN("the second id was set") {
-                REQUIRE(id.key<t2_id>() == 2);
+                REQUIRE(id.get_int<t2_id>() == 2);
             }
         }
     }
@@ -33,10 +33,10 @@ SCENARIO("db::compound_id") {
         WHEN("the id is constructed with the correct number of elements") {
             id = hades::compound_id<t1_id, t2_id>{1, 2};
             THEN("the first id was set") {
-                REQUIRE(id.key<t1_id>() == 1);
+                REQUIRE(id.get_int<t1_id>() == 1);
             }
             THEN("the second id was set") {
-                REQUIRE(id.key<t2_id>() == 2);
+                REQUIRE(id.get_int<t2_id>() == 2);
             }
         }
     }

@@ -17,6 +17,7 @@ namespace hades
         get_key(DbType& db)
         {
             return db.get_int(Attribute);
+            //return 1;
         }
 
         /*!
