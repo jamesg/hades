@@ -61,6 +61,8 @@ namespace hades
         }
     }
 
+    template<const char *...Attributes> class has_candidate_key;
+
     /*!
      * \note This class provides its own storage.  To describe a database type
      * that has a candidate key use has_candidate_key instead.
@@ -71,6 +73,8 @@ namespace hades
         //public detail::has_key_attr<Keys>...
     {
     public:
+        typedef has_candidate_key<Keys...> candidate_key_type;
+
         template<int Start=0>
         static compound_id<Keys...> from_stmt(sqlite3_stmt *stmt)
         {

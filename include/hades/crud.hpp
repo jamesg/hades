@@ -190,8 +190,11 @@ namespace hades
              *
              * \note This function was written to prevent
              * "tuple.set_id(hades::save(...))" in external code.
+             *
+             * \returns True if a new record was created, false if an existing
+             * record was updated.
              */
-            void save(connection& conn)
+            bool save(connection& conn)
             {
                 Tuple& t = static_cast<Tuple&>(*this);
                 transaction tr(conn, "save_transaction");
@@ -207,6 +210,7 @@ namespace hades
                 if(!updated)
                     insert(conn);
                 tr.commit();
+                return !updated;
             }
 
             /*!
