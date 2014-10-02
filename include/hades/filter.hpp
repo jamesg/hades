@@ -66,7 +66,7 @@ namespace hades
             }
             std::string clause() const override
             {
-                return mkstr() << " ORDER BY " << basic_filter::clause();
+                return mkstr() << " ORDER BY " << m_clause;
             }
             void bind(sqlite3_stmt *) const override
             {

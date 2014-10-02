@@ -214,8 +214,6 @@ namespace hades
                         sqlite3_errmsg(conn.handle()) << ")"
                     );
         }
-
-        //bind_values(values, stmt);
         filter_.bind(stmt);
 
         while(sqlite3_step(stmt) == SQLITE_ROW)

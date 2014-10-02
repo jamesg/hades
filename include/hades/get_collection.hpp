@@ -4,6 +4,7 @@
 #include <sqlite3.h>
 
 #include "hades/connection.hpp"
+#include "hades/filter.hpp"
 #include "hades/mkstr.hpp"
 #include "hades/retrieve_values.hpp"
 #include "hades/tuple.hpp"
@@ -13,13 +14,13 @@ namespace hades
     class connection;
 
     /*!
-     * \brief Get every tuple of a relation.
+     * \brief Get every tuple of a relation matching a filter condition.
      *
      * \param Tuple A type deriving from hades::relation and hades::tuple.
      * Determines the relation to query and the fields queried.
      */
     template<typename Tuple>
-    styx::list get_collection(connection& conn, const std::string& where = "1")
+    styx::list get_collection(connection& conn, const basic_filter& filter)
     {
         styx::list list;
 
@@ -27,7 +28,7 @@ namespace hades
         query << "SELECT ";
         Tuple::attribute_list_type::column_list(query);
         query << " FROM " << Tuple::relation_name;
-        query << " WHERE " << where;
+        query << filter.clause();
 
         sqlite3_stmt *stmt = nullptr;
         if(
@@ -45,6 +46,7 @@ namespace hades
                         query.str() << "\""
                     );
         }
+        filter.bind(stmt);
 
         while(sqlite3_step(stmt) == SQLITE_ROW)
         {
@@ -65,6 +67,17 @@ namespace hades
             throw std::runtime_error("finalizing SQLite statement");
 
         return list;
+    }
+    /*!
+     * \brief Get every tuple of a relation.
+     *
+     * \param Tuple A type deriving from hades::relation and hades::tuple.
+     * Determines the relation to query and the fields queried.
+     */
+    template<typename Tuple>
+    styx::list get_collection(connection& conn)
+    {
+        return get_collection<Tuple>(conn, filter_all());
     }
 }
 
