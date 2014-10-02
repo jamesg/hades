@@ -12,7 +12,7 @@
 #include "hades/relation.hpp"
 #include "hades/row.hpp"
 #include "hades/tuple.hpp"
-#include "hades/where.hpp"
+#include "hades/filter.hpp"
 
 namespace hades
 {
@@ -178,13 +178,13 @@ namespace hades
      * Determines the attributes and relation that will be queried.
      * \param values Boost Fusion container of values to bind to placeholders
      * in the query.
-     * \param where SQL where clause to use for the query.  Question mark
+     * \param filter SQL filter clause to use for the query.  Question mark
      * placeholders are filled with values in 'values'.
      */
-    template<const char *Join, bool EquiJoin, typename Where, typename ...Tuples>
+    template<const char *Join, bool EquiJoin, typename ...Tuples>
     styx::list join_(
             connection& conn,
-            const Where& where_
+            const basic_filter& filter_
             )
     {
         styx::list list;
@@ -195,7 +195,7 @@ namespace hades
         query << " FROM ";
         detail::relation_list<Join, Tuples...>(query);
         detail::equijoin_on_clause<EquiJoin, Tuples...>(query);
-        query << " WHERE " << where_.clause();
+        query << filter_.clause();
 
         sqlite3_stmt *stmt = nullptr;
         if(
@@ -216,7 +216,7 @@ namespace hades
         }
 
         //bind_values(values, stmt);
-        where_.bind(stmt);
+        filter_.bind(stmt);
 
         while(sqlite3_step(stmt) == SQLITE_ROW)
         {
@@ -253,9 +253,9 @@ namespace hades
     template<typename ...Tuple>
     styx::list join(connection& conn)
     {
-        return join_<detail::join_type::inner, false, where<>, Tuple...>(
+        return join_<detail::join_type::inner, false, Tuple...>(
                 conn,
-                where<>()
+                filter_all()
                 );
     }
 
@@ -267,15 +267,15 @@ namespace hades
      * \returns A styx::list of styx::objects.  Objects contain all keys from
      * all tuples in the join.
      */
-    template<typename Where, typename ...Tuple>
+    template<typename ...Tuple>
     styx::list join(
             connection& conn,
-            const Where& where_
+            const basic_filter& filter_
             )
     {
-        return join_<detail::join_type::inner, false, Where, Tuple...>(
+        return join_<detail::join_type::inner, false, Tuple...>(
                 conn,
-                where_
+                filter_
                 );
     }
 
@@ -290,9 +290,9 @@ namespace hades
     template<typename ...Tuples>
     styx::list equi_join(connection& conn)
     {
-        return join_<detail::join_type::outer, true, where<>, Tuples...>(
+        return join_<detail::join_type::outer, true, Tuples...>(
                 conn,
-                where<>()
+                filter_all()
                 );
     }
 
@@ -304,15 +304,15 @@ namespace hades
      * \returns A styx::list of styx::objects.  Objects contain all keys from
      * all tuples in the join.
      */
-    template<typename Where, typename ...Tuples>
+    template<typename ...Tuples>
     styx::list equi_join(
             connection& conn,
-            const Where& where_
+            const basic_filter& filter_
             )
     {
-        return join_<detail::join_type::outer, true, Where, Tuples...>(
+        return join_<detail::join_type::outer, true, Tuples...>(
                 conn,
-                where_
+                filter_
                 );
     }
 
@@ -324,12 +324,12 @@ namespace hades
      * \returns A styx::list of styx::objects.  Objects contain all keys from
      * all tuples in the join.
      */
-    template<typename Where, typename ...Tuples>
+    template<typename ...Tuples>
     styx::list outer_join(connection& conn)
     {
-        return join_<detail::join_type::outer, false, where<>, Tuples...>(
+        return join_<detail::join_type::outer, false, Tuples...>(
                 conn,
-                where<>()
+                filter_all()
                 );
     }
 
@@ -341,15 +341,15 @@ namespace hades
      * \returns A styx::list of styx::objects.  Objects contain all keys from
      * all tuples in the join.
      */
-    template<typename Where, typename ...Tuples>
+    template<typename ...Tuples>
     styx::list outer_join(
             connection& conn,
-            const Where& where_
+            const basic_filter& filter_
             )
     {
-        return join_<detail::join_type::outer, false, Where, Tuples...>(
+        return join_<detail::join_type::outer, false, Tuples...>(
                 conn,
-                where_
+                filter_
                 );
     }
 }

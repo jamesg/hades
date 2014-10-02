@@ -26,7 +26,7 @@ SCENARIO("hades::join") {
 
         WHEN("devices and sites are joined") {
             styx::list list =
-                hades::join<hades::where<>, hades::test::site, hades::test::device>(
+                hades::join<hades::test::site, hades::test::device>(
                     conn,
                     hades::where<>("site.site_id = device.site_id")
                     );
