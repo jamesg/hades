@@ -7,6 +7,7 @@
 #include "styx/object_accessor.hpp"
 
 #include "hades/attribute_list.hpp"
+#include "hades/detail/has_attribute.hpp"
 
 namespace hades
 {
@@ -16,25 +17,16 @@ namespace hades
     namespace detail
     {
         /*!
-         * \internal
-         * \brief Establish the fact that a type has an attribute.  Used to
-         * enable accessor functions when the type has the required attribute.
-         */
-        template<const char *Attribute>
-        struct has_attribute
-        {
-        };
-
-        /*!
          * Get the attribute named 'Attribute' from a tuple.  Will only be
          * instantiated if the tuple type inherits from
          * has_attribute<Attribute>.
          */
         template<typename TupleType, const char *Attribute, typename Out>
-        typename std::enable_if<
-            std::is_base_of<has_attribute<Attribute>, TupleType>::value,
-            Out&
-            >::type
+        //typename std::enable_if<
+            //std::is_base_of<has_attribute<Attribute>, TupleType>::value,
+            //Out&
+            //>::type
+        Out&
         get_attribute(TupleType& tuple)
         {
             return tuple.template get<Out>(Attribute);

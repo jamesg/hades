@@ -85,7 +85,7 @@ namespace hades
 
         //
         // First version: write a comma-separated list of extended columns of
-        // the form '(t.id IS NULL) as t_exists'.  Used to recover boolean
+        // the form '(t.id IS NOT NULL) as t_exists'.  Used to recover boolean
         // flags from the result of a join.
         //
         template<typename Flag>
@@ -93,7 +93,7 @@ namespace hades
         all_column_list(std::ostream& os)
         {
             os << "(" << Flag::relation_name << "." <<
-                Flag::first_key_attr << " IS NULL) AS " <<
+                Flag::first_key_attr << " IS NOT NULL) AS " <<
                 Flag::relation_name << "_exists";
         }
 
@@ -139,6 +139,11 @@ namespace hades
         {
             int out = 0;
             get_column(stmt, Start, out);
+#ifdef HADES_ENABLE_DEBUGGING
+            std::cerr << "hades join retrieve flag value: index " << Start <<
+                " relation " << Flag::relation_name << " value " << out <<
+                std::endl;
+#endif
             accessor.get_bool(Flag::relation_name) = (out > 0);
         }
 
@@ -273,6 +278,10 @@ namespace hades
         if(sizeof...(Tuples) > 1)
             detail::equijoin_on_clause<EquiJoin, Tuples...>(query);
         query << filter_.clause();
+
+#ifdef HADES_ENABLE_DEBUGGING
+        std::cerr << "hades join query: \"" << query.str() << "\"" << std::endl;
+#endif
 
         sqlite3_stmt *stmt = nullptr;
         if(

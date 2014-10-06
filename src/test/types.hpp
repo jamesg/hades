@@ -3,6 +3,7 @@
 
 #include "hades/crud.hpp"
 #include "hades/flag.hpp"
+#include "hades/flags.hpp"
 #include "hades/has_candidate_key.hpp"
 #include "hades/relation.hpp"
 #include "hades/tuple.hpp"
@@ -45,7 +46,8 @@ namespace hades
             public hades::relation<relvar::site>,
             public hades::tuple<attr::site_id, attr::name>,
             public hades::has_candidate_key<attr::site_id>,
-            public hades::crud<site>
+            public hades::crud<site>,
+            public hades::flags<flag::site::enabled>
         {
             site()
             {
@@ -67,7 +69,7 @@ namespace hades
             }
         };
 
-        typedef hades::flag<site, test::flag::site::enabled> site_enabled;
+        typedef hades::flag<site::id_type, test::flag::site::enabled> site_enabled;
 
         struct site_location :
             public hades::relation<relvar::site_location>,
@@ -92,7 +94,8 @@ namespace hades
             public hades::relation<relvar::device>,
             public hades::tuple<attr::site_id, attr::device_id, attr::name>,
             public hades::has_candidate_key<attr::site_id, attr::device_id>,
-            public hades::crud<device>
+            public hades::crud<device>,
+            public hades::flags<flag::device::enabled>
         {
             device()
             {
@@ -119,7 +122,7 @@ namespace hades
             }
         };
 
-        typedef hades::flag<device, test::flag::device::enabled> device_enabled;
+        typedef hades::flag<device::id_type, test::flag::device::enabled> device_enabled;
 
         void create(hades::connection&);
     }
