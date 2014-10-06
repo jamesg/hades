@@ -16,6 +16,12 @@ namespace hades
     template<const char *...Attributes>
     class attribute_list;
 
+    template<const char *Attr1, const char *...Attrs>
+    struct first
+    {
+        static constexpr const char *value = Attr1;
+    };
+
     /*!
      * \brief Establish a list of attributes as a candidate key for a type.
      */
@@ -40,6 +46,8 @@ namespace hades
              */
             typedef attribute_list<Attributes...> key_attribute_list;
             typedef has_candidate_key<Attributes...> candidate_key_type;
+
+            static constexpr const char *first_key_attr = first<Attributes...>::value;
 
             /*!
              * \brief Get the value of an attribute within the candidate

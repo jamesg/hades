@@ -2,6 +2,7 @@
 #define HADES_TEST_TYPES_HPP
 
 #include "hades/crud.hpp"
+#include "hades/flag.hpp"
 #include "hades/has_candidate_key.hpp"
 #include "hades/relation.hpp"
 #include "hades/tuple.hpp"
@@ -19,6 +20,18 @@ namespace hades
             extern const char device_id[];
             extern const char city[];
             extern const char name[];
+        }
+
+        namespace flag
+        {
+            namespace site
+            {
+                extern const char enabled[];
+            }
+            namespace device
+            {
+                extern const char enabled[];
+            }
         }
 
         namespace relvar
@@ -53,6 +66,8 @@ namespace hades
                 return get_string<attr::name>();
             }
         };
+
+        typedef hades::flag<site, test::flag::site::enabled> site_enabled;
 
         struct site_location :
             public hades::relation<relvar::site_location>,
@@ -103,6 +118,8 @@ namespace hades
                 return get_string<attr::name>();
             }
         };
+
+        typedef hades::flag<device, test::flag::device::enabled> device_enabled;
 
         void create(hades::connection&);
     }

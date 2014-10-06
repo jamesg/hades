@@ -24,6 +24,27 @@ SCENARIO("hades::join") {
         device_2.name() = "Test Device 2";
         device_2.insert(conn);
 
+        WHEN("a join on one type is requested") {
+            styx::list list = hades::equi_join<hades::test::site>(conn);
+            THEN("the join is equivalent to get_collection") {
+            }
+        }
+
+        WHEN("device is joined with device_enabled") {
+            styx::list list =
+                hades::equi_join<hades::test::device, hades::test::device_enabled>(
+                    conn
+                    );
+            THEN("both devices were returned") {
+                REQUIRE(list.size() == 2);
+            }
+            THEN("the first device is equal to the input and is not enabled") {
+                hades::test::device device_1_out(list[0]);
+                REQUIRE(device_1_out.name() == device_1.name());
+                //REQUIRE(!device_1_out.
+            }
+        }
+
         WHEN("devices and sites are joined") {
             styx::list list =
                 hades::join<hades::test::site, hades::test::device>(
@@ -33,10 +54,13 @@ SCENARIO("hades::join") {
             THEN("two devices were returned") {
                 REQUIRE(list.size() == 2);
             }
-
             THEN("the first device is equal to the input") {
                 hades::test::device device_1_out(list[0]);
                 REQUIRE(device_1_out.name() == device_1.name());
+            }
+            THEN("the second device is equal to the input") {
+                hades::test::device device_2_out(list[1]);
+                REQUIRE(device_2_out.name() == device_2.name());
             }
         }
     }

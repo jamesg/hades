@@ -4,7 +4,6 @@
 #include "hades/bind_values.hpp"
 #include "hades/get_column.hpp"
 #include "styx/object_accessor.hpp"
-//#include "hades/detail/has_key_attr.hpp"
 
 namespace hades
 {

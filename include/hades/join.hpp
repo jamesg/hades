@@ -8,11 +8,12 @@
 
 #include "hades/attribute_list.hpp"
 #include "hades/connection.hpp"
+#include "hades/flag.hpp"
+#include "hades/filter.hpp"
 #include "hades/mkstr.hpp"
 #include "hades/relation.hpp"
 #include "hades/row.hpp"
 #include "hades/tuple.hpp"
-#include "hades/filter.hpp"
 
 namespace hades
 {
@@ -35,6 +36,16 @@ namespace hades
             relation_list<Join, Relation1>(os);
             os << Join;
             relation_list<Join, Relation2, Relations...>(os);
+        }
+
+        //
+        // on_clause: generate the 'ON t1.id = t2.id'... part of the query.
+        //
+
+        template<typename Relation1>
+        void on_clause(std::ostream& os)
+        {
+            // No 'ON' clause for a single relation.
         }
 
         template<typename Relation1, typename Relation2>
@@ -66,11 +77,33 @@ namespace hades
         }
 
         //
-        // all_column_list: write a comma-separated list of column names from
+        // all_column_list: write the attribute list part of the SELECT
+        // statement.  Behaviour depends on the type of tuple.  For standard
+        // tuples, list all attributes.  For flags, extend the result with a
+        // boolean attribute indicating whether the flag is present or not.
+        //
+
+        //
+        // First version: write a comma-separated list of extended columns of
+        // the form '(t.id IS NULL) as t_exists'.  Used to recover boolean
+        // flags from the result of a join.
+        //
+        template<typename Flag>
+        typename std::enable_if<std::is_base_of<detail::basic_flag, Flag>::value>::type
+        all_column_list(std::ostream& os)
+        {
+            os << "(" << Flag::relation_name << "." <<
+                Flag::first_key_attr << " IS NULL) AS " <<
+                Flag::relation_name << "_exists";
+        }
+
+        //
+        // Second version: write a comma-separated list of column names from
         // all tuple types to an output stream.
         //
         template<typename Tuple>
-        void all_column_list(std::ostream& os)
+        typename std::enable_if<!std::is_base_of<detail::basic_flag, Tuple>::value>::type
+        all_column_list(std::ostream& os)
         {
             typedef typename Tuple::attribute_list_type attrl;
             attrl::template qualified_column_list<
@@ -91,9 +124,27 @@ namespace hades
         // record them in an object_accessor.  Values are retrieved starting at
         // an index supplied as the first template parameter.
         //
+        // Again, there are two versions.  The flag version gets the boolean
+        // attribute indicating presence of the tuple.  The tuple version gets
+        // all attributes from the tuple (using
+        // attribute_list::retrieve_values).
+        //
+
+        template<int Start, typename Flag>
+        typename std::enable_if<std::is_base_of<detail::basic_flag, Flag>::value>::type
+        retrieve_tuple_values(
+                sqlite3_stmt *stmt,
+                styx::object_accessor& accessor
+                )
+        {
+            int out = 0;
+            get_column(stmt, Start, out);
+            accessor.get_bool(Flag::relation_name) = (out > 0);
+        }
 
         template<int Start, typename Tuple>
-        void retrieve_tuple_values(
+        typename std::enable_if<!std::is_base_of<detail::basic_flag, Tuple>::value>::type
+        retrieve_tuple_values(
                 sqlite3_stmt *stmt,
                 styx::object_accessor& accessor
                 )
@@ -101,6 +152,32 @@ namespace hades
             typedef typename Tuple::attribute_list_type attrl;
             attrl::template retrieve_values<Start>(stmt, accessor);
         }
+
+        //
+        // Traits types to get the number of attributes in the result related
+        // to a tuple in the join.  This is the number of attributes appended
+        // by all_column_list<Tuple>.
+        //
+
+        struct arity_one
+        {
+            static constexpr const size_t value = 1;
+        };
+        template<typename Tuple>
+        struct arity_copy
+        {
+            static constexpr const size_t value = Tuple::arity;
+        };
+        template<typename Tuple>
+        struct arity
+        {
+            typedef typename std::conditional<
+                std::is_base_of<detail::basic_flag, Tuple>::value,
+                arity_one,
+                arity_copy<Tuple>
+                >::type arity_type;
+            static constexpr const size_t value = arity_type::value;
+        };
 
         //
         // join_values: Traits type to retrieve values from the result of a join
@@ -124,7 +201,6 @@ namespace hades
                     styx::object_accessor& accessor
                     )
             {
-                Rel rel;
                 retrieve_tuple_values<Start, Rel>(stmt, accessor);
             }
 
@@ -135,7 +211,7 @@ namespace hades
                     )
             {
                 retrieve_join_values_<Start, Rel1>(stmt, accessor);
-                retrieve_join_values_<Start+Rel1::arity, Rel2, Rels...>(
+                retrieve_join_values_<Start + arity<Rel1>::value, Rel2, Rels...>(
                         stmt,
                         accessor
                         );
@@ -194,7 +270,8 @@ namespace hades
         detail::all_column_list<Tuples...>(query);
         query << " FROM ";
         detail::relation_list<Join, Tuples...>(query);
-        detail::equijoin_on_clause<EquiJoin, Tuples...>(query);
+        if(sizeof...(Tuples) > 1)
+            detail::equijoin_on_clause<EquiJoin, Tuples...>(query);
         query << filter_.clause();
 
         sqlite3_stmt *stmt = nullptr;
