@@ -14,7 +14,7 @@ namespace hades
         };
     }
     template<const char *...Key>
-    struct flags :
+    struct has_flags :
         detail::has_flag<Key>...
     {
     };

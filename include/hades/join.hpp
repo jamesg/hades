@@ -7,6 +7,7 @@
 #include <sqlite3.h>
 
 #include "hades/attribute_list.hpp"
+#include "hades/conditional_value.hpp"
 #include "hades/connection.hpp"
 #include "hades/flag.hpp"
 #include "hades/filter.hpp"
@@ -176,12 +177,19 @@ namespace hades
         template<typename Tuple>
         struct arity
         {
-            typedef typename std::conditional<
-                std::is_base_of<detail::basic_flag, Tuple>::value,
-                arity_one,
-                arity_copy<Tuple>
-                >::type arity_type;
-            static constexpr const size_t value = arity_type::value;
+            //typedef typename std::conditional<
+                //std::is_base_of<detail::basic_flag, Tuple>::value,
+                //arity_one,
+                //arity_copy<Tuple>
+                //>::type arity_type;
+            //static constexpr const size_t value = arity_type::value;
+
+            static constexpr const size_t value = hades::conditional_value<
+                    size_t,
+                    std::is_base_of<detail::basic_flag, Tuple>::value,
+                    1,
+                    Tuple::arity
+                    >::type::value;
         };
 
         //

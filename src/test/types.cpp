@@ -7,7 +7,6 @@ const char hades::test::attr::device_id[] = "device_id";
 const char hades::test::attr::name[] = "name";
 const char hades::test::attr::city[] = "city";
 const char hades::test::flag::site::enabled[] = "site_enabled";
-const char hades::test::flag::device::enabled[] = "device_enabled";
 const char hades::test::relvar::site[] = "site";
 const char hades::test::relvar::device[] = "device";
 

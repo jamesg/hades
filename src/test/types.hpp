@@ -3,7 +3,7 @@
 
 #include "hades/crud.hpp"
 #include "hades/flag.hpp"
-#include "hades/flags.hpp"
+#include "hades/has_flags.hpp"
 #include "hades/has_candidate_key.hpp"
 #include "hades/relation.hpp"
 #include "hades/tuple.hpp"
@@ -29,10 +29,6 @@ namespace hades
             {
                 extern const char enabled[];
             }
-            namespace device
-            {
-                extern const char enabled[];
-            }
         }
 
         namespace relvar
@@ -47,7 +43,7 @@ namespace hades
             public hades::tuple<attr::site_id, attr::name>,
             public hades::has_candidate_key<attr::site_id>,
             public hades::crud<site>,
-            public hades::flags<flag::site::enabled>
+            public hades::has_flags<flag::site::enabled>
         {
             site()
             {
@@ -94,8 +90,7 @@ namespace hades
             public hades::relation<relvar::device>,
             public hades::tuple<attr::site_id, attr::device_id, attr::name>,
             public hades::has_candidate_key<attr::site_id, attr::device_id>,
-            public hades::crud<device>,
-            public hades::flags<flag::device::enabled>
+            public hades::crud<device>
         {
             device()
             {
@@ -121,8 +116,6 @@ namespace hades
                 return get_string<attr::name>();
             }
         };
-
-        typedef hades::flag<device::id_type, test::flag::device::enabled> device_enabled;
 
         void create(hades::connection&);
     }

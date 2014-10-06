@@ -49,7 +49,7 @@ SCENARIO("hades::join") {
             THEN("the first site is equal to the input and is not enabled") {
                 hades::test::site site_1_out(list[0]);
                 REQUIRE(site_1_out.name() == site_1.name());
-                bool test = site_1_out.get_bool<hades::test::flag::device::enabled>();
+                bool test = site_1_out.get_bool<hades::test::flag::site::enabled>();
                 REQUIRE(!test);
             }
             THEN("the second site is equal to the input and is enabled") {
