@@ -1,7 +1,10 @@
-#ifndef HADES_FLAGS_HPP
-#define HADES_FLAGS_HPP
+#ifndef HADES_HAS_FLAGS_HPP
+#define HADES_HAS_FLAGS_HPP
 
-#include "hades/crud/save.ipp"
+#ifdef HADES_ENABLE_DEBUGGING
+#include <iostream>
+#endif
+//#include "hades/crud/save.ipp"
 #include "hades/detail/basic_has_flags.hpp"
 #include "hades/detail/has_attribute.hpp"
 #include "hades/flag.hpp"
@@ -19,13 +22,21 @@ namespace hades
             template<typename Tuple>
             void save_flag(Tuple& t, connection& conn)
             {
+#ifdef HADES_ENABLE_DEBUGGING
                 std::cerr << "hades saving flag " << Tuple::relation_name << std::endl;
+#endif
                 bool flag_value = get_bool(Flag);
                 flag<typename Tuple::id_type, Flag> f(t.id());
+                try
+                {
                 if(flag_value)
-                    save(f, conn);
+                    f.save(conn);
                 else
-                    destroy(f, conn);
+                    f.destroy(conn);
+                }
+                catch(const std::exception&)
+                {
+                }
             }
         };
     }

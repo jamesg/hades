@@ -1,8 +1,8 @@
-#define HADES_ENABLE_DEBUGGING
-
 #include "hades/transaction.hpp"
 
+#ifdef HADES_ENABLE_DEBUGGING
 #include <iostream>
+#endif
 #include <sstream>
 #include <stdexcept>
 

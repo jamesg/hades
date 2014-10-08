@@ -4,6 +4,7 @@
 
 #include "hades/attribute_list.hpp"
 #include "hades/crud.hpp"
+#include "hades/crud.ipp"
 #include "hades/devoid.hpp"
 #include "hades/get_by_id.hpp"
 #include "hades/has_candidate_key.hpp"

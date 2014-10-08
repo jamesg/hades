@@ -3,9 +3,9 @@
 
 #include <type_traits>
 
-#include "hades/crud/save.ipp"
-#include "hades/crud/insert.ipp"
-#include "hades/crud/destroy.ipp"
+//#include "hades/crud/save.ipp"
+//#include "hades/crud/insert.ipp"
+//#include "hades/crud/destroy.ipp"
 #include "hades/detail/basic_has_flags.hpp"
 
 namespace hades

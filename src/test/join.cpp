@@ -1,7 +1,7 @@
-#define HADES_ENABLE_DEBUGGING
 #include "catch.hpp"
 
 #include "hades/connection.hpp"
+#include "hades/crud.ipp"
 #include "hades/join.hpp"
 
 #include "types.hpp"

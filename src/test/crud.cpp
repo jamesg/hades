@@ -2,6 +2,7 @@
 
 #include "hades/connection.hpp"
 #include "hades/get_by_id.hpp"
+#include "hades/crud.ipp"
 
 #include "types.hpp"
 
