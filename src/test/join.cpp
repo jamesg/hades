@@ -17,7 +17,8 @@ SCENARIO("hades::join") {
 
         hades::test::site site_2;
         site_2.name() = "Test Site 2";
-        site_2.insert(conn);
+        site_2.get_bool<hades::test::flag::site::enabled>() = true;
+        site_2.save(conn);
 
         hades::test::device device_1;
         device_1.site_id() = site_1.site_id();
@@ -29,8 +30,8 @@ SCENARIO("hades::join") {
         device_2.name() = "Test Device 2";
         device_2.insert(conn);
 
-        hades::test::site_enabled enabled(site_2.id());
-        enabled.save(conn);
+        //hades::test::site_enabled enabled(site_2.id());
+        //enabled.save(conn);
 
         WHEN("a join on one type is requested") {
             styx::list list = hades::equi_join<hades::test::site>(conn);

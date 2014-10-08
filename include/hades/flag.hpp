@@ -1,7 +1,8 @@
 #ifndef HADES_FLAG_HPP
 #define HADES_FLAG_HPP
 
-#include "hades/crud.hpp"
+#include "styx/object_accessor.hpp"
+//#include "hades/crud.hpp"
 #include "hades/relation.hpp"
 
 namespace hades
@@ -18,8 +19,8 @@ namespace hades
         public detail::basic_flag,
         public Id::candidate_key_type,
         public Id::candidate_key_type::tuple_type,
-        public relation<Relation>,
-        public crud<flag<Id, Relation>>
+        public relation<Relation>/*,*/
+        //public crud<flag<Id, Relation>>
     {
         flag(Id id_) :
             styx::object_accessor(id_.get_element())
@@ -29,12 +30,26 @@ namespace hades
         {
             return false;
         }
-        void set(hades::connection& conn)
-        {
-        }
-        void unset(hades::connection& conn)
-        {
-        }
+        //void set(hades::connection& conn)
+        //{
+            //try
+            //{
+                //crud<flag<Id, Relation>>::save();
+            //}
+            //catch(const std::exception&)
+            //{
+            //}
+        //}
+        //void unset(hades::connection& conn)
+        //{
+            //try
+            //{
+                //crud<flag<Id, Relation>>::destroy();
+            //}
+            //catch(const std::exception&)
+            //{
+            //}
+        //}
     };
 }
 
