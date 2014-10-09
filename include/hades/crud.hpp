@@ -1,14 +1,11 @@
 #ifndef HADES_CRUD_HPP
 #define HADES_CRUD_HPP
 
-#include "hades/get_collection.hpp"
+#include "styx/list.hpp"
 
 namespace hades
 {
     class connection;
-
-    template<typename Tuple>
-    class crud;
 
     /*!
      * \brief Provide basic CRUD (create, read, update and delete) functions
@@ -28,10 +25,13 @@ namespace hades
     class crud
     {
     public:
-        static styx::list get_collection(hades::connection& conn)
-        {
-            return hades::get_collection<Tuple>(conn);
-        }
+        /*!
+         * \brief Get all tuples of this type from the database.
+         */
+        static styx::list get_collection(connection&);
+
+        template<typename Id>
+        void from_id(connection&, Id id);
 
         /*!
          * \brief Insert the tuple into the database.  The id of this tuple
@@ -40,7 +40,7 @@ namespace hades
          * \note This function was written to prevent
          * "tuple.set_id(hades::insert(...))" in external code.
          */
-        void insert(hades::connection& conn);
+        void insert(connection&);
 
         /*!
          * \brief Save the tuple to the database.  Updates the tuple if it
@@ -53,7 +53,7 @@ namespace hades
          * \returns True if a new record was created, false if an existing
          * record was updated.
          */
-        bool save(connection& conn);
+        bool save(connection&);
 
         /*!
          * \brief Updates the tuple in the database.  The id of this tuple
@@ -62,12 +62,12 @@ namespace hades
          * \note This function was written to prevent
          * "tuple.set_id(hades::save(...))" in external code.
          */
-        bool update(connection& conn);
+        bool update(connection&);
 
         /*!
          * \brief Delete the tuple from the database.
          */
-        bool destroy(connection& conn);
+        bool destroy(connection&);
     };
 }
 
