@@ -60,19 +60,26 @@ namespace hades
     class order_by : public basic_filter
     {
         public:
-            order_by(const std::string& clause) :
-                m_clause(clause)
+            order_by(const std::string& clause, const int limit=-1, const int offset=0) :
+                m_clause(clause),
+                m_limit(limit),
+                m_offset(offset)
             {
             }
             std::string clause() const override
             {
-                return mkstr() << " ORDER BY " << m_clause;
+                hades::mkstr out;
+                out << "ORDER BY " << m_clause;
+                if(m_limit != -1)
+                    out << " LIMIT " << m_limit << " OFFSET " << m_offset;
+                return out;
             }
             void bind(sqlite3_stmt *) const override
             {
             }
         private:
             const std::string m_clause;
+            const int m_limit, m_offset;
     };
 
     template<typename Where>
