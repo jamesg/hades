@@ -285,7 +285,7 @@ namespace hades
         detail::relation_list<Join, Tuples...>(query);
         if(sizeof...(Tuples) > 1)
             detail::equijoin_on_clause<EquiJoin, Tuples...>(query);
-        query << filter_.clause();
+        query << " " << filter_.clause();
 
 #ifdef HADES_ENABLE_DEBUGGING
         std::cerr << "hades join query: \"" << query.str() << "\"" << std::endl;
