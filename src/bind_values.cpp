@@ -1,5 +1,9 @@
 #include "hades/bind_values.hpp"
 
+#ifdef HADES_ENABLE_DEBUGGING
+#include <iostream>
+#endif
+
 #include "hades/mkstr.hpp"
 
 void hades::bind_any(int index, const styx::element& element, sqlite3_stmt *stmt)
@@ -47,7 +51,9 @@ void hades::bind_any(int index, const styx::element& element, sqlite3_stmt *stmt
 
         void operator()(const styx::null_t&) const
         {
+#ifdef HADES_ENABLED_DEBUGGING
             std::cerr << "binding null" << std::endl;
+#endif
             hades::bind_null(index, stmt);
         }
     };

@@ -28,7 +28,7 @@ namespace hades
         query << "SELECT ";
         Tuple::attribute_list_type::column_list(query);
         query << " FROM " << Tuple::relation_name;
-        query << filter.clause();
+        query << " " << filter.clause();
 
         sqlite3_stmt *stmt = nullptr;
         if(
@@ -94,7 +94,7 @@ namespace hades
         query << "SELECT ";
         Tuple::attribute_list_type::column_list(query);
         query << " FROM " << Tuple::relation_name;
-        query << filter.clause();
+        query << " " << filter.clause();
 
         sqlite3_stmt *stmt = nullptr;
         if(
