@@ -6,6 +6,7 @@
 namespace hades
 {
     class connection;
+    class basic_filter;
 
     /*!
      * \brief Provide basic CRUD (create, read, update and delete) functions
@@ -29,6 +30,11 @@ namespace hades
          * \brief Get all tuples of this type from the database.
          */
         static styx::list get_collection(connection&);
+        /*!
+         * \brief Get all tuples of this type from the database matching a
+         * filter.
+         */
+        static styx::list get_collection(connection&, basic_filter&);
 
         template<typename Id>
         void from_id(connection&, Id id);
