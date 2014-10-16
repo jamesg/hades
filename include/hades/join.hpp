@@ -391,6 +391,7 @@ namespace hades
         styx::list out = detail::fetch_join_result<Tuples...>(stmt);
         if(sqlite3_finalize(stmt) != SQLITE_OK)
             throw std::runtime_error("finalizing SQLite statement");
+        return out;
     }
 
     /*!
