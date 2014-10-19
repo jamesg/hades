@@ -433,7 +433,7 @@ namespace hades
 
     /*!
      * \brief Execute an SQL SELECT query on multiple tables.  Tables are joined
-     * using an OUTER JOIN.  All attributes in all tables will be retrieved
+     * using an INNER JOIN.  All attributes in all tables will be retrieved
      * using a hades::relations_accessor.
      *
      * \returns A styx::list of styx::objects.  Objects contain all keys from
@@ -441,6 +441,43 @@ namespace hades
      */
     template<typename ...Tuples>
     styx::list equi_join(connection& conn)
+    {
+        return join_<detail::join_type::inner, true, Tuples...>(
+                conn,
+                filter_all()
+                );
+    }
+
+    /*!
+     * \brief Execute an SQL SELECT query on multiple tables.  Tables are joined
+     * using an INNER JOIN.  All attributes in all tables will be retrieved
+     * using a hades::relations_accessor.
+     *
+     * \returns A styx::list of styx::objects.  Objects contain all keys from
+     * all tuples in the join.
+     */
+    template<typename ...Tuples>
+    styx::list equi_join(
+            connection& conn,
+            const basic_filter& filter_
+            )
+    {
+        return join_<detail::join_type::inner, true, Tuples...>(
+                conn,
+                filter_
+                );
+    }
+
+    /*!
+     * \brief Execute an SQL SELECT query on multiple tables.  Tables are joined
+     * using an OUTER JOIN.  All attributes in all tables will be retrieved
+     * using a hades::relations_accessor.
+     *
+     * \returns A styx::list of styx::objects.  Objects contain all keys from
+     * all tuples in the join.
+     */
+    template<typename ...Tuples>
+    styx::list equi_outer_join(connection& conn)
     {
         return join_<detail::join_type::outer, true, Tuples...>(
                 conn,
@@ -457,7 +494,7 @@ namespace hades
      * all tuples in the join.
      */
     template<typename ...Tuples>
-    styx::list equi_join(
+    styx::list equi_outer_join(
             connection& conn,
             const basic_filter& filter_
             )
