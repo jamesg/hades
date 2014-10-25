@@ -254,6 +254,35 @@ namespace hades
         }
     }
 
+    namespace detail
+    {
+        template<typename ...Tuples>
+        styx::list fetch_join_result(sqlite3_stmt *stmt)
+        {
+            styx::list list;
+
+            while(sqlite3_step(stmt) == SQLITE_ROW)
+            {
+                try
+                {
+                    styx::object_accessor accessor;
+                    detail::join_values<Tuples...>::retrieve_join_values(
+                            stmt,
+                            accessor
+                            );
+                    list.append(accessor.get_element());
+                }
+                catch(const std::exception&)
+                {
+                    sqlite3_finalize(stmt);
+                    throw;
+                }
+            }
+
+            return list;
+        }
+    }
+
     /*!
      * \brief Execute an SQL SELECT query on multiple tables.  All attributes
      * of all relations used in the JOIN are retrieved.
@@ -261,12 +290,64 @@ namespace hades
      * \internal
      *
      * \param Join Type of join (see namespace hades::detail::join_type).
-     * \param Values A Boost Fusion container type.  hades::row is an easy to
-     * use container.
-     * \param Tuples A type inheriting from hades::tuple and hades::relation.
+     * \param Tuples Types inheriting from hades::tuple and hades::relation.
      * Determines the attributes and relation that will be queried.
-     * \param values Boost Fusion container of values to bind to placeholders
-     * in the query.
+     * \param on String to be used as a SQL ON clause.
+     * \param filter SQL filter clause to use for the query.  Question mark
+     * placeholders are filled with values in 'values'.
+     */
+    template<const char *Join, typename ...Tuples>
+    styx::list join_on_(
+            connection& conn,
+            const std::string& on,
+            const basic_filter& filter_
+            )
+    {
+        std::ostringstream query;
+        query << "SELECT ";
+        detail::all_column_list<Tuples...>(query);
+        query << " FROM ";
+        detail::relation_list<Join, Tuples...>(query);
+        query << " ON " << on;
+        query << " " << filter_.clause();
+
+#ifdef HADES_ENABLE_DEBUGGING
+        std::cerr << "hades join query: \"" << query.str() << "\"" << std::endl;
+#endif
+
+        sqlite3_stmt *stmt = nullptr;
+        if(
+            sqlite3_prepare(
+                conn.handle(),
+                query.str().c_str(),
+                -1,
+                &stmt,
+                nullptr
+                ) != SQLITE_OK
+            )
+        {
+            throw std::runtime_error(
+                    mkstr() << "preparing SQLite statement \"" <<
+                        query.str() << "\" (" <<
+                        sqlite3_errmsg(conn.handle()) << ")"
+                    );
+        }
+        filter_.bind(stmt);
+        styx::list out = detail::fetch_join_result<Tuples...>(stmt);
+        if(sqlite3_finalize(stmt) != SQLITE_OK)
+            throw std::runtime_error("finalizing SQLite statement");
+        return out;
+    }
+
+    /*!
+     * \brief Execute an SQL SELECT query on multiple tables.  All attributes
+     * of all relations used in the JOIN are retrieved.
+     *
+     * \internal
+     *
+     * \param Join Type of join (see namespace hades::detail::join_type).
+     * \param Tuples Types inheriting from hades::tuple and hades::relation.
+     * Determines the attributes and relation that will be queried.
      * \param filter SQL filter clause to use for the query.  Question mark
      * placeholders are filled with values in 'values'.
      */
@@ -276,8 +357,6 @@ namespace hades
             const basic_filter& filter_
             )
     {
-        styx::list list;
-
         std::ostringstream query;
         query << "SELECT ";
         detail::all_column_list<Tuples...>(query);
@@ -309,29 +388,10 @@ namespace hades
                     );
         }
         filter_.bind(stmt);
-
-        while(sqlite3_step(stmt) == SQLITE_ROW)
-        {
-            try
-            {
-                styx::object_accessor accessor;
-                detail::join_values<Tuples...>::retrieve_join_values(
-                        stmt,
-                        accessor
-                        );
-                list.append(accessor.get_element());
-            }
-            catch(const std::exception&)
-            {
-                sqlite3_finalize(stmt);
-                throw;
-            }
-        }
-
+        styx::list out = detail::fetch_join_result<Tuples...>(stmt);
         if(sqlite3_finalize(stmt) != SQLITE_OK)
             throw std::runtime_error("finalizing SQLite statement");
-
-        return list;
+        return out;
     }
 
     /*!
@@ -373,7 +433,7 @@ namespace hades
 
     /*!
      * \brief Execute an SQL SELECT query on multiple tables.  Tables are joined
-     * using an OUTER JOIN.  All attributes in all tables will be retrieved
+     * using an INNER JOIN.  All attributes in all tables will be retrieved
      * using a hades::relations_accessor.
      *
      * \returns A styx::list of styx::objects.  Objects contain all keys from
@@ -381,6 +441,43 @@ namespace hades
      */
     template<typename ...Tuples>
     styx::list equi_join(connection& conn)
+    {
+        return join_<detail::join_type::inner, true, Tuples...>(
+                conn,
+                filter_all()
+                );
+    }
+
+    /*!
+     * \brief Execute an SQL SELECT query on multiple tables.  Tables are joined
+     * using an INNER JOIN.  All attributes in all tables will be retrieved
+     * using a hades::relations_accessor.
+     *
+     * \returns A styx::list of styx::objects.  Objects contain all keys from
+     * all tuples in the join.
+     */
+    template<typename ...Tuples>
+    styx::list equi_join(
+            connection& conn,
+            const basic_filter& filter_
+            )
+    {
+        return join_<detail::join_type::inner, true, Tuples...>(
+                conn,
+                filter_
+                );
+    }
+
+    /*!
+     * \brief Execute an SQL SELECT query on multiple tables.  Tables are joined
+     * using an OUTER JOIN.  All attributes in all tables will be retrieved
+     * using a hades::relations_accessor.
+     *
+     * \returns A styx::list of styx::objects.  Objects contain all keys from
+     * all tuples in the join.
+     */
+    template<typename ...Tuples>
+    styx::list equi_outer_join(connection& conn)
     {
         return join_<detail::join_type::outer, true, Tuples...>(
                 conn,
@@ -397,7 +494,7 @@ namespace hades
      * all tuples in the join.
      */
     template<typename ...Tuples>
-    styx::list equi_join(
+    styx::list equi_outer_join(
             connection& conn,
             const basic_filter& filter_
             )
@@ -441,6 +538,46 @@ namespace hades
     {
         return join_<detail::join_type::outer, false, Tuples...>(
                 conn,
+                filter_
+                );
+    }
+
+    /*!
+     * \brief Execute an SQL SELECT query on multiple tables.  Tables are joined
+     * using an OUTER JOIN.  All attributes in all tables will be retrieved
+     * using a hades::relations_accessor.
+     *
+     * \returns A styx::list of styx::objects.  Objects contain all keys from
+     * all tuples in the join.
+     */
+    template<typename ...Tuples>
+    styx::list outer_join(connection& conn, const std::string& on)
+    {
+        return join_on_<detail::join_type::outer, Tuples...>(
+                conn,
+                on,
+                filter_all()
+                );
+    }
+
+    /*!
+     * \brief Execute an SQL SELECT query on multiple tables.  Tables are joined
+     * using an OUTER JOIN.  All attributes in all tables will be retrieved
+     * using a hades::relations_accessor.
+     *
+     * \returns A styx::list of styx::objects.  Objects contain all keys from
+     * all tuples in the join.
+     */
+    template<typename ...Tuples>
+    styx::list outer_join(
+            connection& conn,
+            const std::string& on,
+            const basic_filter& filter_
+            )
+    {
+        return join_on_<detail::join_type::outer, Tuples...>(
+                conn,
+                on,
                 filter_
                 );
     }
