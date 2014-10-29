@@ -107,12 +107,6 @@ namespace hades
         {
         }
 
-        //template<const char *Key_>
-        //int& key()
-        //{
-            ////return detail::get_key<compound_id<Keys...>, Key_>(*this);
-            //return tuple<Keys...>::template get_int<Key_>();
-        //}
         /*!
          * \brief Bind values of a compound_id to a statement.
          */

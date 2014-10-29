@@ -1,6 +1,9 @@
 #ifndef HADES_GET_BY_ID_HPP
 #define HADES_GET_BY_ID_HPP
 
+#ifdef HADES_ENABLE_DEBUGGING
+#include <iostream>
+#endif
 #include <sqlite3.h>
 
 #include "styx/serialisers/vector.hpp"
@@ -8,7 +11,7 @@
 #include "hades/bind_values.hpp"
 #include "hades/compound_id.hpp"
 #include "hades/connection.hpp"
-//#include "hades/detail/has_key_attr.hpp"
+#include "hades/mkstr.hpp"
 #include "hades/retrieve_values.hpp"
 
 namespace hades
@@ -59,8 +62,8 @@ namespace hades
                 )
         {
             std::ostringstream oss_;
-            oss_ << "error in SQLite select; query: " << oss.str() <<
-                " SQLite error: " << sqlite3_errmsg(conn.handle()) << std::endl;
+            oss_ << "error in SQLite select; query: \"" << oss.str() <<
+                "\" sqlite error: " << sqlite3_errmsg(conn.handle()) << std::endl;
             throw std::runtime_error(oss_.str());
         }
 
@@ -74,11 +77,14 @@ namespace hades
         else
         {
             sqlite3_finalize(stmt);
-            throw std::runtime_error("select did not yield one row");
+            throw std::runtime_error(
+                    mkstr() << "SELECT did not yield one row: \"" <<
+                        oss.str() << "\""
+                        );
         }
 
         if( sqlite3_finalize(stmt) != SQLITE_OK )
-            throw std::runtime_error("Finalizing SQLite statement");
+            throw std::runtime_error("finalizing sqlite statement");
     }
 
     template<typename Out>

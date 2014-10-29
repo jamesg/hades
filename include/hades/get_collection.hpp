@@ -11,8 +11,6 @@
 
 namespace hades
 {
-    class connection;
-
     /*!
      * \brief Get every tuple of a relation matching a filter condition.
      *

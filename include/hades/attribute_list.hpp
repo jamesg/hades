@@ -1,6 +1,10 @@
 #ifndef HADES_ATTRIBUTE_LIST_HPP
 #define HADES_ATTRIBUTE_LIST_HPP
 
+#ifndef HADES_ENABLE_DEBUGGING
+#include <iostream>
+#endif
+
 #include "hades/bind_values.hpp"
 #include "hades/get_column.hpp"
 #include "styx/object_accessor.hpp"
@@ -181,6 +185,12 @@ namespace hades
         static void retrieve_values_(sqlite3_stmt *stmt, styx::object_accessor& out)
         {
             const char *value = hades::get_column_text(stmt, Index);
+#ifdef HADES_ENABLE_DEBUGGING
+            std::cerr <<
+                "hades::attribute_list::retrieve_values: retrieving " <<
+                Index << " " << Attr << " value: " << (value?value:"null") <<
+                std::endl;
+#endif
             if(value)
                 out.get_string(Attr) = value;
         }

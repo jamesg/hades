@@ -36,8 +36,17 @@ namespace hades
          */
         static styx::list get_collection(connection&, basic_filter&);
 
+        /*!
+         * \brief Retrieve all non-id fields of this tuple based on the id.
+         */
         template<typename Id>
         void from_id(connection&, Id id);
+
+        /*!
+         * \brief Check whether a tuple with the id of this tuple exists in the
+         * database.
+         */
+        bool exists(connection&);
 
         /*!
          * \brief Insert the tuple into the database.  The id of this tuple
