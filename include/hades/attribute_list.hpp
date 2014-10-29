@@ -4,6 +4,7 @@
 #ifndef HADES_ENABLE_DEBUGGING
 #include <iostream>
 #endif
+#include <type_traits>
 
 #include "hades/bind_values.hpp"
 #include "hades/get_column.hpp"
@@ -17,8 +18,17 @@ namespace hades
     template<const char *...Attributes>
     class tuple;
 
+    namespace detail
+    {
+        template<const char *Attr>
+        struct attribute_list_member
+        {
+        };
+    }
+
     template<const char *...Attributes>
-    class attribute_list
+    class attribute_list :
+        public detail::attribute_list_member<Attributes>...
     {
     public:
         /*!
@@ -26,7 +36,14 @@ namespace hades
          * list of attributes.
          */
         template<const char *Attribute>
-        using extend = attribute_list<Attributes..., Attribute>;
+        using extend = typename std::conditional<
+            std::is_base_of<
+                detail::attribute_list_member<Attribute>,
+                attribute_list<Attributes...>
+                >::value,
+            attribute_list<Attributes...>,
+            attribute_list<Attributes..., Attribute>
+            >::type;
 
         /*!
          * \brief A tuple type with the same attributes.
