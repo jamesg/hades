@@ -1,7 +1,7 @@
 #ifndef HADES_ATTRIBUTE_LIST_HPP
 #define HADES_ATTRIBUTE_LIST_HPP
 
-#ifndef HADES_ENABLE_DEBUGGING
+#ifdef HADES_ENABLE_DEBUGGING
 #include <iostream>
 #endif
 #include <type_traits>
