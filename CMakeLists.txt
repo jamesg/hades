@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 2.6)
 project(Hades)
 enable_testing()
 
+include_directories("include")
+
 file(GLOB hades_sources src/*.cpp src/detail/*.cpp)
 file(GLOB hades_test_sources src/test/*.cpp)
 
