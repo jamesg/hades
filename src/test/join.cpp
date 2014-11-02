@@ -41,7 +41,7 @@ SCENARIO("hades::join") {
 
         WHEN("device is joined with device_enabled") {
             styx::list list =
-                hades::equi_join<hades::test::site, hades::test::site_enabled>(
+                hades::equi_outer_join<hades::test::site, hades::test::site_enabled>(
                     conn
                     );
             THEN("both sites were returned") {
