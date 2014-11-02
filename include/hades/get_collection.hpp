@@ -14,6 +14,8 @@ namespace hades
     /*!
      * \brief Get every tuple of a relation matching a filter condition.
      *
+     * \note Does not obtain additional flags.
+     *
      * \param Tuple A type deriving from hades::relation and hades::tuple.
      * Determines the relation to query and the fields queried.
      */

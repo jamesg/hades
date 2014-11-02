@@ -28,16 +28,22 @@ namespace hades
     public:
         /*!
          * \brief Get all tuples of this type from the database.
+         *
+         * \note Does not obtain additional flags.
          */
         static styx::list get_collection(connection&);
         /*!
          * \brief Get all tuples of this type from the database matching a
          * filter.
+         *
+         * \note Does not obtain additional flags.
          */
         static styx::list get_collection(connection&, basic_filter&);
 
         /*!
          * \brief Retrieve all non-id fields of this tuple based on the id.
+         *
+         * \note Does not obtain additional flags.
          */
         template<typename Id>
         void from_id(connection&, Id id);
@@ -54,6 +60,7 @@ namespace hades
          *
          * \note This function was written to prevent
          * "tuple.set_id(hades::insert(...))" in external code.
+         * \note Does not update additional flags.
          */
         void insert(connection&);
 
@@ -67,6 +74,7 @@ namespace hades
          *
          * \returns True if a new record was created, false if an existing
          * record was updated.
+         * \note Does not update additional flags.
          */
         bool save(connection&);
 
@@ -76,6 +84,7 @@ namespace hades
          *
          * \note This function was written to prevent
          * "tuple.set_id(hades::save(...))" in external code.
+         * \note Does not update additional flags.
          */
         bool update(connection&);
 

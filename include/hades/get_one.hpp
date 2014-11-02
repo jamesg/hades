@@ -15,6 +15,8 @@ namespace hades
      * \brief Get a single tuple matching a hades::filter.  Throws an exception
      * if no such tuple is found.
      *
+     * \note Does not obtain additional flags.
+     *
      * \throws std::exception
      */
     template<typename Tuple>
