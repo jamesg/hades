@@ -29,7 +29,7 @@ namespace hades
         Out&
         get_attribute(TupleType& tuple)
         {
-            return tuple.template get<Out>(Attribute);
+            return tuple.template get<Out&>(Attribute);
         }
     }
 
@@ -68,6 +68,22 @@ namespace hades
 
             static constexpr const size_t arity = sizeof...(Attributes);
 
+            /*!
+             * \brief Get a reference to one of the attributes in the
+             * tuple.
+             *
+             * \note This function can only be instantiated if Attr is a
+             * member of Attributes.
+             */
+            template<const char *Attr, typename Out>
+            Out& get_attr()
+            {
+                return detail::get_attribute<
+                    tuple<Attributes...>,
+                    Attr,
+                    Out>(*this);
+            }
+
             //
             // Alternatives to styx::object_accessor's get_ functions,
             // accepting the key as a template argument rather than a function
@@ -79,22 +95,22 @@ namespace hades
             template<const char *Attr>
             bool& get_bool()
             {
-                return get_attr<Attr, bool&>();
+                return get_attr<Attr, bool>();
             }
             template<const char *Attr>
             double& get_double()
             {
-                return get_attr<Attr, double&>();
+                return get_attr<Attr, double>();
             }
             template<const char *Attr>
             int& get_int()
             {
-                return get_attr<Attr, int&>();
+                return get_attr<Attr, int>();
             }
             template<const char *Attr>
             std::string& get_string()
             {
-                return get_attr<Attr, std::string&>();
+                return get_attr<Attr, std::string>();
             }
             //template<const char *Attr>
             //bool has_key()
@@ -157,22 +173,6 @@ namespace hades
             }
 
         private:
-            /*!
-             * \brief Get a reference to one of the attributes in the
-             * tuple.
-             *
-             * \note This function can only be instantiated if Attr is a
-             * member of Attributes.
-             */
-            template<const char *Attr, typename Out>
-            Out get_attr()
-            {
-                return detail::get_attribute<
-                    tuple<Attributes...>,
-                    Attr,
-                    Out>(*this);
-            }
-
             template<const char *Attr1, const char *Attr2, const char *...Attrs>
             void value_attributes_(std::vector<const char*>& out)
             {
