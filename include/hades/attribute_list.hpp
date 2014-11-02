@@ -53,7 +53,7 @@ namespace hades
         /*!
          * \brief A has_candidate_key type with the same attributes.
          */
-        typedef tuple<Attributes...> has_candidate_key_type;
+        typedef has_candidate_key<Attributes...> has_candidate_key_type;
 
         /*!
          * \brief Append a comma-separated list of columns to a stream.
