@@ -25,7 +25,11 @@ namespace hades
                 m_oss << output;
                 return *this;
             }
-            operator std::string()
+            operator std::string() const
+            {
+                return str();
+            }
+            std::string str() const
             {
                 return m_oss.str();
             }
