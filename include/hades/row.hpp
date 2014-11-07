@@ -1,5 +1,5 @@
-#ifndef SQLITE_ROW_HPP
-#define SQLITE_ROW_HPP
+#ifndef HADES_ROW_HPP
+#define HADES_ROW_HPP
 
 #include <vector>
 
