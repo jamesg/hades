@@ -11,8 +11,10 @@
 #include "hades/bind_values.hpp"
 #include "hades/compound_id.hpp"
 #include "hades/connection.hpp"
+#include "hades/crud/get_flags.ipp"
 #include "hades/mkstr.hpp"
 #include "hades/retrieve_values.hpp"
+#include "hades/transaction.hpp"
 
 namespace hades
 {
@@ -32,6 +34,7 @@ namespace hades
             Out& out
             )
     {
+        hades::transaction transaction(conn, "hades_get_by_id");
         std::vector<Out> out_vector;
         std::ostringstream oss;
         oss << "SELECT ";
@@ -85,6 +88,8 @@ namespace hades
 
         if( sqlite3_finalize(stmt) != SQLITE_OK )
             throw std::runtime_error("finalizing sqlite statement");
+
+        detail::get_flags<Out>(conn, out);
     }
 
     template<typename Out>

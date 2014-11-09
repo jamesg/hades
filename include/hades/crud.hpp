@@ -43,7 +43,7 @@ namespace hades
         /*!
          * \brief Retrieve all non-id fields of this tuple based on the id.
          *
-         * \note Does not obtain additional flags.
+         * \note Obtains additional flags.
          */
         template<typename Id>
         void from_id(connection&, Id id);
@@ -74,7 +74,7 @@ namespace hades
          *
          * \returns True if a new record was created, false if an existing
          * record was updated.
-         * \note Does not update additional flags.
+         * \note Updates additional flags.
          */
         bool save(connection&);
 
@@ -84,12 +84,15 @@ namespace hades
          *
          * \note This function was written to prevent
          * "tuple.set_id(hades::save(...))" in external code.
-         * \note Does not update additional flags.
+         * \note Updates additional flags.
          */
         bool update(connection&);
 
         /*!
          * \brief Delete the tuple from the database.
+         *
+         * \note Does not delete additional flags.  Flag tables should have
+         * been created with "ON DELETE CASCADE".
          */
         bool destroy(connection&);
     };

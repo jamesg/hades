@@ -1,7 +1,6 @@
 #ifndef HADES_CRUD_SAVE_IPP
 #define HADES_CRUD_SAVE_IPP
 
-#include "hades/crud/save_flags.ipp"
 #include "hades/transaction.hpp"
 
 namespace hades
@@ -25,7 +24,6 @@ bool hades::crud<Tuple>::save(connection& conn)
     }
     if(!updated)
         insert(conn);
-    detail::save_flags<Tuple>(static_cast<Tuple&>(*this), conn);
     tr.commit();
     return !updated;
 }

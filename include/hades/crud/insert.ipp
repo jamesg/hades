@@ -8,6 +8,7 @@
 #include <sqlite3.h>
 
 #include "hades/crud.hpp"
+#include "hades/crud/save_flags.ipp"
 #include "hades/connection.hpp"
 #include "hades/bind_values.hpp"
 #include "hades/detail/last_insert_rowid.hpp"
@@ -161,6 +162,8 @@ void hades::crud<Tuple>::insert(connection& conn)
                 sqlite3_errmsg(conn.handle());
             throw std::runtime_error(error_string.str());
         }
+
+        detail::save_flags<Tuple>(static_cast<Tuple&>(*this), conn);
     }
 }
 

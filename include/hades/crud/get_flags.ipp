@@ -1,5 +1,5 @@
-#ifndef HADES_CRUD_SAVE_FLAGS_IPP
-#define HADES_CRUD_SAVE_FLAGS_IPP
+#ifndef HADES_CRUD_GET_FLAGS_IPP
+#define HADES_CRUD_GET_FLAGS_IPP
 
 #include <type_traits>
 
@@ -12,16 +12,16 @@ namespace hades
     {
         template<typename Tuple>
         typename std::enable_if<std::is_base_of<basic_has_flags, Tuple>::value>::type
-        save_flags(Tuple& t, connection& conn)
+        get_flags(connection& conn, Tuple& t)
         {
-            t.save_flags(t, conn);
+            t.get_flags(conn, t);
         }
 
         template<typename Tuple>
         typename std::enable_if<!std::is_base_of<basic_has_flags, Tuple>::value>::type
-        save_flags(Tuple& t, connection& conn)
+        get_flags(connection&, Tuple&)
         {
-            // There are no flags to save, do nothing.
+            // There are no flags to get, do nothing.
         }
     }
 }

@@ -4,7 +4,6 @@
 #ifdef HADES_ENABLE_DEBUGGING
 #include <iostream>
 #endif
-//#include "hades/crud/save.ipp"
 #include "hades/detail/basic_has_flags.hpp"
 #include "hades/detail/has_attribute.hpp"
 #include "hades/flag.hpp"
@@ -29,14 +28,23 @@ namespace hades
                 flag<typename Tuple::id_type, Flag> f(t.id());
                 try
                 {
-                if(flag_value)
-                    f.save(conn);
-                else
-                    f.destroy(conn);
+                    if(flag_value)
+                        f.save(conn);
+                    else
+                        f.destroy(conn);
                 }
                 catch(const std::exception&)
                 {
                 }
+            }
+            template<typename Tuple>
+            void get_flag(connection& conn, Tuple& t)
+            {
+#ifdef HADES_ENABLE_DEBUGGING
+                std::cerr << "hades getting flag " << Tuple::relation_name << std::endl;
+#endif
+                flag<typename Tuple::id_type, Flag> f(t.id());
+                get_bool(Flag) = f.exists(conn);
             }
         };
     }
@@ -47,11 +55,27 @@ namespace hades
         virtual styx::object_accessor
     {
         template<typename Tuple>
+        void get_flags(connection& conn, Tuple& t)
+        {
+            get_flags_<Tuple, Keys...>(conn, t);
+        }
+        template<typename Tuple>
         void save_flags(Tuple& t, connection& conn)
         {
             save_flags_<Tuple, Keys...>(t, conn);
         }
     private:
+        template<typename Tuple, const char *Flag>
+        void get_flags_(connection& conn, Tuple& t)
+        {
+            detail::has_flag<Flag>::get_flag(conn, t);
+        }
+        template<typename Tuple, const char *Flag1, const char *Flag2, const char *...Flags>
+        void get_flags_(connection& conn, Tuple& t)
+        {
+            get_flags_<Tuple, Flag1>(conn, t);
+            get_flags_<Tuple, Flag2, Flags...>(conn, t);
+        }
         template<typename Tuple, const char *Flag>
         void save_flags_(Tuple& t, connection& conn)
         {

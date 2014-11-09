@@ -77,6 +77,9 @@ bool hades::crud<Tuple>::update(connection& conn)
                 );
     }
 
+    // Only update the flags if a row was affected by the tuple update.
+    if(count > 0)
+        detail::save_flags<Tuple>(static_cast<Tuple&>(*this), conn);
     // The number of rows updated (0 or 1, because the target tuples were
     // selected by a candidate key).
     return (count > 0);
