@@ -1,6 +1,9 @@
 #ifndef HADES_TEMPORARY_TABLE_HPP
 #define HADES_TEMPORARY_TABLE_HPP
 
+#ifdef HADES_ENABLE_DEBUGGING
+#include <iostream>
+#endif
 #include "hades/devoid.hpp"
 #include "hades/mkstr.hpp"
 #include "hades/row.hpp"
@@ -31,12 +34,23 @@ namespace hades
             }
             ~temporary_table()
             {
-                if(m_created)
-                    devoid(
-                        mkstr() << "DROP TABLE " << m_name,
-                        empty_row(),
-                        m_conn
-                        );
+                // Do not throw an exception from a destructor.
+                try
+                {
+                    if(m_created)
+                        devoid(
+                            mkstr() << "DROP TABLE " << m_name,
+                            empty_row(),
+                            m_conn
+                            );
+                }
+                catch(const std::exception& e)
+                {
+#ifdef HADES_ENABLE_DEBUGGING
+                    std::cerr << "hades error dropping temporary table: " <<
+                        e.what() << std::endl;
+#endif
+                }
             }
             const std::string& name() const
             {
