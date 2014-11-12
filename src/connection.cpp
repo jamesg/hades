@@ -2,6 +2,8 @@
 
 #include <stdexcept>
 
+#include "hades/mkstr.hpp"
+
 hades::connection hades::connection::in_memory_database()
 {
     connection c(":memory:");
@@ -26,27 +28,40 @@ hades::connection::connection(std::string filename) :
     sqlite3_stmt *stmt = nullptr;
     sqlite3_prepare(m_handle, "PRAGMA foreign_keys = ON", -1, &stmt, nullptr);
     int ret = sqlite3_step(stmt);
-    if( ret != SQLITE_DONE && ret != SQLITE_OK )
+    int finalise_ret = sqlite3_finalize(stmt);
+    if(ret != SQLITE_DONE && ret != SQLITE_OK)
     {
-        throw std::runtime_error("enabling SQLite foreign key processing");
+        throw std::runtime_error(
+            mkstr() << "enabling foreign key processing: " <<
+                sqlite3_errmsg(m_handle)
+            );
     }
-    sqlite3_finalize(stmt);
+    if(finalise_ret != SQLITE_OK)
+        throw std::runtime_error(
+            mkstr() << "finalising query to enable foreign key processing: " <<
+                sqlite3_errmsg(m_handle)
+            );
 }
 
-hades::connection::connection(connection&& o) :
-    m_handle(o.m_handle)
+hades::connection::connection(connection&& o) /*:*/
+    //m_handle(o.m_handle)
 {
+    m_handle = o.m_handle;
     o.m_handle = nullptr;
 }
 
 hades::connection::~connection()
 {
-    if(m_handle)
+    if(m_handle != nullptr)
+    {
         sqlite3_close(m_handle);
+    }
 }
 
 sqlite3 *hades::connection::handle()
 {
+    if(m_handle == nullptr)
+        throw std::runtime_error("handle is null");
     return m_handle;
 }
 
