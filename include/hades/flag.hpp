@@ -26,30 +26,6 @@ namespace hades
             styx::object_accessor(id_.get_element())
         {
         }
-        bool isset(hades::connection& conn)
-        {
-            return false;
-        }
-        //void set(hades::connection& conn)
-        //{
-            //try
-            //{
-                //crud<flag<Id, Relation>>::save();
-            //}
-            //catch(const std::exception&)
-            //{
-            //}
-        //}
-        //void unset(hades::connection& conn)
-        //{
-            //try
-            //{
-                //crud<flag<Id, Relation>>::destroy();
-            //}
-            //catch(const std::exception&)
-            //{
-            //}
-        //}
     };
 }
 
