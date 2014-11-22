@@ -9,6 +9,7 @@
 
 #include "hades/connection.hpp"
 #include "hades/crud.hpp"
+#include "hades/exception.hpp"
 #include "hades/mkstr.hpp"
 #include "styx/serialisers/vector.hpp"
 
@@ -17,7 +18,7 @@ bool hades::crud<Tuple>::update(connection& conn)
 {
     Tuple& t = static_cast<Tuple&>(*this);
     if(!t.id_set())
-        throw std::runtime_error("cannot update a tuple if id is incomplete");
+        throw hades::exception("cannot update a tuple if id is incomplete");
 
     std::ostringstream oss;
     oss << "UPDATE " << Tuple::relation_name << " SET ";
@@ -48,7 +49,7 @@ bool hades::crud<Tuple>::update(connection& conn)
                 ) != SQLITE_OK
             )
     {
-        throw std::runtime_error(
+        throw hades::exception(
                 mkstr() << "hades::update: preparing UPDATE query \"" <<
                     oss.str() << "\": " << sqlite3_errmsg(conn.handle())
                 );
@@ -60,7 +61,7 @@ bool hades::crud<Tuple>::update(connection& conn)
     int step_ret = sqlite3_step(stmt);
     if(step_ret != SQLITE_OK && step_ret != SQLITE_DONE)
     {
-        throw std::runtime_error(
+        throw hades::exception(
                 mkstr() << "stepping SQLite UPDATE query \"" <<
                     oss.str() << "\": " << sqlite3_errmsg(conn.handle())
                 );
@@ -71,7 +72,7 @@ bool hades::crud<Tuple>::update(connection& conn)
     int finalise_ret = sqlite3_finalize(stmt);
     if(finalise_ret != SQLITE_OK && finalise_ret != SQLITE_DONE)
     {
-        throw std::runtime_error(
+        throw hades::exception(
                 mkstr() << "finalising SQLite UPDATE query \"" <<
                     oss.str() << "\": " << sqlite3_errmsg(conn.handle())
                 );

@@ -4,6 +4,7 @@
 #include <sqlite3.h>
 
 #include "hades/connection.hpp"
+#include "hades/exception.hpp"
 #include "hades/filter.hpp"
 #include "hades/mkstr.hpp"
 #include "hades/retrieve_values.hpp"
@@ -41,7 +42,7 @@ namespace hades
                 ) != SQLITE_OK
             )
         {
-            throw std::runtime_error(
+            throw hades::exception(
                     mkstr() << "preparing SQLite statement \"" <<
                         query.str() << "\""
                     );
@@ -64,7 +65,7 @@ namespace hades
         }
 
         if(sqlite3_finalize(stmt) != SQLITE_OK)
-            throw std::runtime_error("finalizing SQLite statement");
+            throw hades::exception("finalizing SQLite statement");
 
         return vector;
     }
@@ -107,7 +108,7 @@ namespace hades
                 ) != SQLITE_OK
             )
         {
-            throw std::runtime_error(
+            throw hades::exception(
                     mkstr() << "preparing SQLite statement \"" <<
                         query.str() << "\""
                     );
@@ -130,7 +131,7 @@ namespace hades
         }
 
         if(sqlite3_finalize(stmt) != SQLITE_OK)
-            throw std::runtime_error("finalizing SQLite statement");
+            throw hades::exception("finalizing SQLite statement");
 
         return list;
     }

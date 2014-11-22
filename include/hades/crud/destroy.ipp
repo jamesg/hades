@@ -5,10 +5,10 @@
 #include <iostream>
 #endif
 #include <sstream>
-#include <stdexcept>
 #include <sqlite3.h>
 
 #include "hades/connection.hpp"
+#include "hades/exception.hpp"
 #include "hades/mkstr.hpp"
 
 template<typename Tuple>
@@ -31,7 +31,7 @@ bool hades::crud<Tuple>::destroy(connection& conn)
                 nullptr
                 ) != SQLITE_OK
             )
-        throw std::runtime_error(
+        throw hades::exception(
                 mkstr() << "preparing SQLite DELETE query \"" <<
                     oss.str() << "\" message: " <<
                     sqlite3_errmsg(conn.handle())
@@ -39,7 +39,7 @@ bool hades::crud<Tuple>::destroy(connection& conn)
     auto id = static_cast<Tuple&>(*this).id();
     Tuple::id_type::bind_key_values(id, stmt);
     if(sqlite3_step(stmt) != SQLITE_DONE)
-        throw std::runtime_error(
+        throw hades::exception(
                 mkstr() << "stepping SQLite DELETE query \"" <<
                     oss.str() << "\" message: " <<
                     sqlite3_errmsg(conn.handle())
@@ -47,7 +47,7 @@ bool hades::crud<Tuple>::destroy(connection& conn)
     int count = sqlite3_changes(conn.handle());
     int finalise_ret = sqlite3_finalize(stmt);
     if(finalise_ret != SQLITE_OK && finalise_ret != SQLITE_DONE)
-        throw std::runtime_error(
+        throw hades::exception(
                 mkstr() << "finalising SQLite DELETE query \"" <<
                     oss.str() << "\" message: " <<
                     sqlite3_errmsg(conn.handle())

@@ -12,6 +12,7 @@
 #include "hades/compound_id.hpp"
 #include "hades/connection.hpp"
 #include "hades/crud/get_flags.ipp"
+#include "hades/exception.hpp"
 #include "hades/mkstr.hpp"
 #include "hades/retrieve_values.hpp"
 #include "hades/transaction.hpp"
@@ -64,10 +65,10 @@ namespace hades
                     ) != SQLITE_OK
                 )
         {
-            std::ostringstream oss_;
-            oss_ << "error in SQLite select; query: \"" << oss.str() <<
-                "\" sqlite error: " << sqlite3_errmsg(conn.handle()) << std::endl;
-            throw std::runtime_error(oss_.str());
+            throw hades::exception(
+                mkstr() << "error in SQLite select; query: \"" << oss.str() <<
+                    "\" sqlite error: " << sqlite3_errmsg(conn.handle())
+                    );
         }
 
         // First parameter is index 1.
@@ -80,14 +81,14 @@ namespace hades
         else
         {
             sqlite3_finalize(stmt);
-            throw std::runtime_error(
+            throw hades::exception(
                     mkstr() << "SELECT did not yield one row: \"" <<
                         oss.str() << "\""
                         );
         }
 
         if( sqlite3_finalize(stmt) != SQLITE_OK )
-            throw std::runtime_error("finalizing sqlite statement");
+            throw hades::exception("finalizing sqlite statement");
 
         detail::get_flags<Out>(conn, out);
     }

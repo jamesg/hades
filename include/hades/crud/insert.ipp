@@ -11,6 +11,7 @@
 #include "hades/crud/save_flags.ipp"
 #include "hades/connection.hpp"
 #include "hades/bind_values.hpp"
+#include "hades/exception.hpp"
 #include "hades/detail/last_insert_rowid.hpp"
 #include "hades/mkstr.hpp"
 #include "styx/serialisers/vector.hpp"
@@ -66,7 +67,7 @@ void hades::crud<Tuple>::insert(connection& conn)
                     ) != SQLITE_OK
                 )
         {
-            throw std::runtime_error(
+            throw hades::exception(
                     mkstr() << "preparing SQLite statement \"" <<
                         query.str() << "\" for insert (" <<
                         sqlite3_errmsg(conn.handle()) << ")"
@@ -79,7 +80,7 @@ void hades::crud<Tuple>::insert(connection& conn)
         }
         catch(const std::exception& e)
         {
-            throw std::runtime_error(
+            throw hades::exception(
                     mkstr() << "binding values to insert: " << e.what() <<
                     " query   \"" << query.str() << "\""
                     );
@@ -91,7 +92,7 @@ void hades::crud<Tuple>::insert(connection& conn)
             std::ostringstream error_string;
             error_string << "stepping SQLite insert " << query.str() <<
                 " " << sqlite3_errmsg(conn.handle());
-            throw std::runtime_error(error_string.str());
+            throw hades::exception(error_string.str());
         }
 
         int finalise_ret = sqlite3_finalize(stmt);
@@ -100,7 +101,7 @@ void hades::crud<Tuple>::insert(connection& conn)
             std::ostringstream error_string;
             error_string << "SQLite finalise " << query.str() << " " <<
                 sqlite3_errmsg(conn.handle());
-            throw std::runtime_error(error_string.str());
+            throw hades::exception(error_string.str());
         }
     }
 
@@ -125,7 +126,7 @@ void hades::crud<Tuple>::insert(connection& conn)
                     ) != SQLITE_OK
                 )
         {
-            throw std::runtime_error(
+            throw hades::exception(
                     mkstr() << "preparing id query \"" << id_query.str() << "\""
                     );
         }
@@ -136,7 +137,7 @@ void hades::crud<Tuple>::insert(connection& conn)
         }
         catch(const std::exception& e)
         {
-            throw std::runtime_error(
+            throw hades::exception(
                     mkstr() << "binding to id statement: " << e.what()
                     );
         }
@@ -144,7 +145,7 @@ void hades::crud<Tuple>::insert(connection& conn)
         int step_ret = sqlite3_step(last_id_stmt);
         if(step_ret != SQLITE_ROW)
         {
-            throw std::runtime_error(
+            throw hades::exception(
                 mkstr() << "stepping SQLite select last id \"" <<
                     id_query.str() << "\" " << sqlite3_errmsg(conn.handle())
                 );
@@ -160,7 +161,7 @@ void hades::crud<Tuple>::insert(connection& conn)
             std::ostringstream error_string;
             error_string << "SQLite finalise " << id_query.str() << " " <<
                 sqlite3_errmsg(conn.handle());
-            throw std::runtime_error(error_string.str());
+            throw hades::exception(error_string.str());
         }
 
         detail::save_flags<Tuple>(static_cast<Tuple&>(*this), conn);

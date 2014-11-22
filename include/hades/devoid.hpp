@@ -10,6 +10,7 @@
 
 #include "hades/bind_values.hpp"
 #include "hades/connection.hpp"
+#include "hades/exception.hpp"
 #include "hades/mkstr.hpp"
 
 namespace hades
@@ -18,7 +19,7 @@ namespace hades
      * \brief Execute a query that is not expected to return a result (or
      * returns a result that we are not interested in).
      *
-     * \throws std::runtime_error when an SQL error is encountered.
+     * \throws hades::exception when an SQL error is encountered.
      */
     void devoid(const std::string& query, connection& db);
     /*!
@@ -29,7 +30,7 @@ namespace hades
      * mark placeholders in the SQL statement.  A useful container is
      * hades::row.
      *
-     * \throws std::runtime_error when an SQL error is encountered.
+     * \throws hades::exception when an SQL error is encountered.
      */
     template <typename T>
     void devoid(const std::string& query, const T& values, connection& db)
@@ -40,12 +41,12 @@ namespace hades
         int step_ret = sqlite3_step(stmt);
         int finalise_ret = sqlite3_finalize(stmt);
         if(step_ret != SQLITE_DONE)
-            throw std::runtime_error(
+            throw hades::exception(
                 mkstr() << "stepping devoid SQL query \"" << query <<
                     "\": " << sqlite3_errmsg(db.handle())
                 );
         if(finalise_ret != SQLITE_OK)
-            throw std::runtime_error(
+            throw hades::exception(
                 mkstr() << "finalising devoid SQL query \"" << query <<
                     "\": " << sqlite3_errmsg(db.handle())
                 );

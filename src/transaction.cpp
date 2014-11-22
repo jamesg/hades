@@ -11,6 +11,7 @@
 #include <sqlite3.h>
 
 #include "hades/devoid.hpp"
+#include "hades/exception.hpp"
 #include "hades/mkstr.hpp"
 #include "hades/row.hpp"
 
@@ -53,7 +54,7 @@ void hades::transaction::commit()
 #ifdef HADES_ENABLE_DEBUGGING
         std::cerr << "hades savepoint already released" << std::endl;
 #endif
-        throw std::runtime_error("Savepoint already released");
+        throw hades::exception("Savepoint already released");
     }
 
     devoid(mkstr() << "RELEASE SAVEPOINT " << m_savepoint_name, m_connection);
@@ -76,7 +77,7 @@ void hades::transaction::commit()
 void hades::transaction::rollback()
 {
     if(m_released)
-        throw std::runtime_error("Savepoint already released");
+        throw hades::exception("Savepoint already released");
 
     devoid(
         mkstr() << "ROLLBACK TO SAVEPOINT " <<

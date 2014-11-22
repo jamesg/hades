@@ -2,6 +2,7 @@
 
 #include <stdexcept>
 
+#include "hades/exception.hpp"
 #include "hades/mkstr.hpp"
 
 hades::connection hades::connection::in_memory_database()
@@ -21,7 +22,7 @@ hades::connection::connection(std::string filename) :
             sqlite3_close(m_handle);
             m_handle = nullptr;
         }
-        throw std::runtime_error("Unable to open SQLite connection");
+        throw hades::exception("Unable to open SQLite connection");
     }
 
     // Enable foreign keys
@@ -31,13 +32,13 @@ hades::connection::connection(std::string filename) :
     int finalise_ret = sqlite3_finalize(stmt);
     if(ret != SQLITE_DONE && ret != SQLITE_OK)
     {
-        throw std::runtime_error(
+        throw hades::exception(
             mkstr() << "enabling foreign key processing: " <<
                 sqlite3_errmsg(m_handle)
             );
     }
     if(finalise_ret != SQLITE_OK)
-        throw std::runtime_error(
+        throw hades::exception(
             mkstr() << "finalising query to enable foreign key processing: " <<
                 sqlite3_errmsg(m_handle)
             );
@@ -61,7 +62,7 @@ hades::connection::~connection()
 sqlite3 *hades::connection::handle()
 {
     if(m_handle == nullptr)
-        throw std::runtime_error("handle is null");
+        throw hades::exception("handle is null");
     return m_handle;
 }
 

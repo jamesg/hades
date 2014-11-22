@@ -7,6 +7,7 @@
 #include <sqlite3.h>
 
 #include "hades/connection.hpp"
+#include "hades/mkstr.hpp"
 
 template<typename Tuple>
 bool hades::crud<Tuple>::exists(connection& conn)
@@ -39,10 +40,10 @@ bool hades::crud<Tuple>::exists(connection& conn)
                 ) != SQLITE_OK
             )
     {
-        std::ostringstream oss_;
-        oss_ << "error in SQLite select; query: \"" << oss.str() <<
-            "\" sqlite error: " << sqlite3_errmsg(conn.handle()) << std::endl;
-        throw std::runtime_error(oss_.str());
+        throw hades::exception(
+            mkstr() << "error in SQLite select; query: \"" << oss.str() <<
+                "\" sqlite error: " << sqlite3_errmsg(conn.handle())
+                );
     }
 
     Tuple& t = static_cast<Tuple&>(*this);

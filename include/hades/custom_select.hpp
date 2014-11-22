@@ -11,6 +11,7 @@
 #include "hades/attribute_list.hpp"
 #include "hades/bind_values.hpp"
 #include "hades/connection.hpp"
+#include "hades/exception.hpp"
 #include "hades/mkstr.hpp"
 
 namespace hades
@@ -33,7 +34,7 @@ namespace hades
                         nullptr
                         ) != SQLITE_OK )
             {
-                throw std::runtime_error(
+                throw hades::exception(
                     mkstr() << "preparing SQLite statement for custom_select \"" <<
                         query << "\": " << sqlite3_errmsg(conn.handle())
                     );
@@ -47,7 +48,7 @@ namespace hades
             }
 
             if(sqlite3_finalize(stmt) != SQLITE_OK)
-                throw std::runtime_error("Finalizing SQLite statement");
+                throw hades::exception("Finalizing SQLite statement");
         }
         template<typename OutputIterator, typename Tuple, typename Values, const char *...Attributes>
         void custom_select(
@@ -66,7 +67,7 @@ namespace hades
                         nullptr
                         ) != SQLITE_OK )
             {
-                throw std::runtime_error(
+                throw hades::exception(
                     mkstr() << "preparing SQLite statement for custom_select \"" <<
                         query << "\": " << sqlite3_errmsg(conn.handle())
                     );
@@ -82,7 +83,7 @@ namespace hades
             }
 
             if(sqlite3_finalize(stmt) != SQLITE_OK)
-                throw std::runtime_error("Finalizing SQLite statement");
+                throw hades::exception("Finalizing SQLite statement");
         }
     }
     template<typename Tuple, const char *...Attributes>
@@ -138,7 +139,7 @@ namespace hades
                     nullptr
                     ) != SQLITE_OK )
         {
-            throw std::runtime_error(
+            throw hades::exception(
                 mkstr() << "preparing SQLite statement for custom_select \"" <<
                     query << "\": " << sqlite3_errmsg(conn.handle())
                 );
@@ -153,7 +154,7 @@ namespace hades
         }
 
         if(sqlite3_finalize(stmt) != SQLITE_OK)
-            throw std::runtime_error("Finalizing SQLite statement");
+            throw hades::exception("Finalizing SQLite statement");
 
         return list;
     }
@@ -185,7 +186,7 @@ namespace hades
                     nullptr
                     ) != SQLITE_OK )
         {
-            throw std::runtime_error(
+            throw hades::exception(
                 mkstr() << "preparing SQLite statement for custom_select \"" <<
                     query << "\": " << sqlite3_errmsg(conn.handle())
                 );
@@ -202,7 +203,7 @@ namespace hades
         }
 
         if(sqlite3_finalize(stmt) != SQLITE_OK)
-            throw std::runtime_error("Finalizing SQLite statement");
+            throw hades::exception("Finalizing SQLite statement");
 
         return list;
     }

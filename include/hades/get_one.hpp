@@ -4,6 +4,7 @@
 #include <sqlite3.h>
 
 #include "hades/connection.hpp"
+#include "hades/exception.hpp"
 #include "hades/filter.hpp"
 #include "hades/mkstr.hpp"
 #include "hades/retrieve_values.hpp"
@@ -39,7 +40,7 @@ namespace hades
                 ) != SQLITE_OK
             )
         {
-            throw std::runtime_error(
+            throw hades::exception(
                     mkstr() << "preparing SQLite statement \"" <<
                         query.str() << "\""
                     );
@@ -61,7 +62,7 @@ namespace hades
                 throw;
             }
             if(sqlite3_step(stmt) == SQLITE_ROW)
-                throw std::runtime_error(
+                throw hades::exception(
                     mkstr() <<
                     "hades::get_one: SELECT yielded multiple rows: \"" <<
                     query.str() << "\""
@@ -70,7 +71,7 @@ namespace hades
         else
         {
             sqlite3_finalize(stmt);
-            throw std::runtime_error(
+            throw hades::exception(
                 mkstr() <<
                 "hades::get_one: SELECT yielded zero rows: \"" <<
                 query.str() << "\""

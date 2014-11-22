@@ -9,6 +9,7 @@
 #include "hades/attribute_list.hpp"
 #include "hades/conditional_value.hpp"
 #include "hades/connection.hpp"
+#include "hades/exception.hpp"
 #include "hades/flag.hpp"
 #include "hades/filter.hpp"
 #include "hades/mkstr.hpp"
@@ -326,7 +327,7 @@ namespace hades
                 ) != SQLITE_OK
             )
         {
-            throw std::runtime_error(
+            throw hades::exception(
                     mkstr() << "preparing SQLite statement \"" <<
                         query.str() << "\" (" <<
                         sqlite3_errmsg(conn.handle()) << ")"
@@ -335,7 +336,7 @@ namespace hades
         filter_.bind(stmt);
         styx::list out = detail::fetch_join_result<Tuples...>(stmt);
         if(sqlite3_finalize(stmt) != SQLITE_OK)
-            throw std::runtime_error("finalizing SQLite statement");
+            throw hades::exception("finalizing SQLite statement");
         return out;
     }
 
@@ -381,7 +382,7 @@ namespace hades
                 ) != SQLITE_OK
             )
         {
-            throw std::runtime_error(
+            throw hades::exception(
                     mkstr() << "preparing SQLite statement \"" <<
                         query.str() << "\" (" <<
                         sqlite3_errmsg(conn.handle()) << ")"
@@ -390,7 +391,7 @@ namespace hades
         filter_.bind(stmt);
         styx::list out = detail::fetch_join_result<Tuples...>(stmt);
         if(sqlite3_finalize(stmt) != SQLITE_OK)
-            throw std::runtime_error("finalizing SQLite statement");
+            throw hades::exception("finalizing SQLite statement");
         return out;
     }
 

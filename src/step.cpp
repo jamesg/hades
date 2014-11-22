@@ -4,6 +4,7 @@
 #include <stdexcept>
 
 #include "hades/connection.hpp"
+#include "hades/exception.hpp"
 
 void hades::step(sqlite3_stmt *stmt)
 {
@@ -21,9 +22,9 @@ void hades::step(sqlite3_stmt *stmt)
                 sqlite3_sleep(250);
                 break;
             case SQLITE_ERROR:
-                throw std::runtime_error("Stepping SQLite query");
+                throw hades::exception("Stepping SQLite query");
             default:
-                throw std::runtime_error("Unhandled SQLITE return code");
+                throw hades::exception("Unhandled SQLITE return code");
         }
     }
 }
@@ -48,10 +49,10 @@ void hades::step(sqlite3_stmt *stmt, connection& conn)
                     std::ostringstream oss;
                     oss << "stepping sqlite query: ";
                     oss << sqlite3_errmsg(conn.handle());
-                    throw std::runtime_error(oss.str());
+                    throw hades::exception(oss.str());
                 }
             default:
-                throw std::runtime_error("Unhandled SQLITE return code");
+                throw hades::exception("Unhandled SQLITE return code");
         }
     }
 }
