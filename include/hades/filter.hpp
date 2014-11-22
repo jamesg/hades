@@ -1,6 +1,8 @@
 #ifndef HADES_FILTER_HPP
 #define HADES_FILTER_HPP
 
+#include <memory>
+
 #include "hades/bind_values.hpp"
 #include "hades/mkstr.hpp"
 #include "hades/row.hpp"
@@ -14,7 +16,35 @@ namespace hades
             virtual std::string clause() const = 0;
     };
 
+    class basic_where_values
+    {
+        public:
+            virtual void bind(sqlite3_stmt *stmt) const = 0;
+            virtual std::unique_ptr<basic_where_values> clone() const = 0;
+    };
     template<typename ...Values>
+    class where_values :
+        public basic_where_values
+    {
+        public:
+            where_values(const hades::row<Values...> values) :
+                m_values(values)
+            {
+            }
+            void bind(sqlite3_stmt *stmt) const override
+            {
+                bind_values(m_values, stmt);
+            }
+            std::unique_ptr<basic_where_values> clone() const
+            {
+                return std::unique_ptr<basic_where_values>(
+                        new where_values(m_values)
+                        );
+            }
+        private:
+            hades::row<Values...> m_values;
+    };
+
     class where : public basic_filter
     {
         public:
@@ -22,31 +52,29 @@ namespace hades
              * \brief A where clause which selects all tuples.
              */
             where() :
-                m_clause("1")
+                m_clause("1"),
+                m_values(new where_values<>(hades::row<>()))
             {
-                static_assert(
-                        sizeof...(Values) == 0,
-                        "a where clause without any placeholders can't have "
-                        "any bound values"
-                        );
             }
+            template<typename ...Values>
             where(const std::string& clause_, hades::row<Values...> values) :
                 m_clause(clause_),
-                m_values(values)
+                m_values(new where_values<Values...>(values))
             {
             }
             where(const std::string& clause_) :
-                m_clause(clause_)
+                m_clause(clause_),
+                m_values(new where_values<>(hades::row<>()))
             {
-                static_assert(
-                        sizeof...(Values) == 0,
-                        "a where clause without any placeholders can't have "
-                        "any bound values"
-                        );
+            }
+            where(const where& o) :
+                m_clause(o.m_clause),
+                m_values(o.m_values->clone())
+            {
             }
             void bind(sqlite3_stmt *stmt) const override
             {
-                bind_values(m_values, stmt);
+                m_values->bind(stmt);
             }
             std::string clause() const override
             {
@@ -54,7 +82,7 @@ namespace hades
             }
         private:
             const std::string m_clause;
-            hades::row<Values...> m_values;
+            std::unique_ptr<basic_where_values> m_values;
     };
 
     class order_by : public basic_filter
@@ -66,6 +94,12 @@ namespace hades
                 m_offset(offset)
             {
             }
+            //order_by(const order_by& o) :
+                //m_clause(o.m_clause),
+                //m_limit(o.m_limit),
+                //m_offset(o.m_offset)
+            //{
+            //}
             std::string clause() const override
             {
                 hades::mkstr out;
@@ -82,11 +116,10 @@ namespace hades
             const int m_limit, m_offset;
     };
 
-    template<typename Where>
     class filter : public basic_filter
     {
         public:
-            filter(const Where& where_, const order_by& order_by_) :
+            filter(const where& where_, const order_by& order_by_) :
                 m_where(where_),
                 m_order_by(order_by_)
             {
@@ -100,7 +133,7 @@ namespace hades
                 m_where.bind(stmt);
             }
         private:
-            const Where m_where;
+            const where m_where;
             const order_by m_order_by;
     };
 

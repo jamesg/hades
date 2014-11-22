@@ -65,7 +65,7 @@ SCENARIO("hades::join") {
             styx::list list =
                 hades::join<hades::test::site, hades::test::device>(
                     conn,
-                    hades::where<>("site.site_id = device.site_id")
+                    hades::where("site.site_id = device.site_id")
                     );
             THEN("two devices were returned") {
                 REQUIRE(list.size() == 2);

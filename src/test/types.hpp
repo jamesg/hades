@@ -48,8 +48,7 @@ namespace hades
             site()
             {
             }
-
-            site(styx::element& o) :
+            site(const styx::element& o) :
                 styx::object_accessor(o)
             {
             }
@@ -95,8 +94,7 @@ namespace hades
             device()
             {
             }
-
-            device(styx::element& o) :
+            device(const styx::element& o) :
                 styx::object_accessor(o)
             {
             }
