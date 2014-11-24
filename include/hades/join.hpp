@@ -1,7 +1,9 @@
 #ifndef HADES_JOIN_HPP
 #define HADES_JOIN_HPP
 
+#ifdef HADES_ENABLE_DEBUGGING
 #include <iostream>
+#endif
 #include <type_traits>
 
 #include <sqlite3.h>
@@ -75,7 +77,7 @@ namespace hades
         {
             on_clause<Relation1, Relation2>(os);
             os << " AND ";
-            on_clause<Relation2, Relation3, Relations...>(os);
+            on_clause<Relation1, Relation3, Relations...>(os);
         }
 
         //
