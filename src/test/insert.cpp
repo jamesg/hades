@@ -65,8 +65,7 @@ SCENARIO("hades::insert") {
             s.name() = "new name";
             s.insert(conn);
             THEN("the tuple has been updated") {
-                site q_s;
-                hades::get_by_id(conn, s.id(), q_s);
+                site q_s = hades::get_by_id<site>(conn, s.id());
                 REQUIRE(q_s.name() == s.name());
             }
         }

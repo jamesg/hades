@@ -31,7 +31,10 @@ namespace
         public hades::tuple<attribute::site_id, attribute::name>,
         public hades::has_candidate_key<attribute::site_id>
     {
-        site(styx::element& o) :
+        site()
+        {
+        }
+        site(const styx::element& o) :
             styx::object_accessor(o)
         {
         }
@@ -73,9 +76,7 @@ SCENARIO("hades::update") {
             s.name() = "new name";
             s.update(conn);
             THEN("the tuple has been updated") {
-                styx::element q_s_o;
-                site q_s(q_s_o);
-                hades::get_by_id(conn, site::id_type{1}, q_s);
+                site q_s = hades::get_by_id<site>(conn, site::id_type{1});
                 REQUIRE(q_s.name() == s.name());
             }
         }

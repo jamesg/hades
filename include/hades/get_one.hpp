@@ -21,7 +21,7 @@ namespace hades
      * \throws hades::exception if zero or more than one tuple are found.
      */
     template<typename Tuple>
-    Tuple get_one(connection& conn, basic_filter& filter)
+    Tuple get_one(connection& conn, const basic_filter& filter)
     {
         std::ostringstream query;
         query << "SELECT ";

@@ -50,6 +50,14 @@ namespace hades
         typename detail::extend_row<N, std::string>::type;
 
     /*!
+     * \brief A row of int.
+     *
+     * \param N arity of the row.
+     */
+    template<int N> using int_row =
+        typename detail::extend_row<N, int>::type;
+
+    /*!
      * \brief Get the value of a column from a row.  The index of the column is
      * a zero-based integer provided as the first template argument.
      *

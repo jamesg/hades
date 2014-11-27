@@ -9,6 +9,7 @@
 
 #include "hades/attribute_list.hpp"
 #include "hades/detail/has_key_attr.hpp"
+#include "hades/filter.hpp"
 #include "hades/retrieve_values.hpp"
 #include "hades/tuple.hpp"
 
@@ -134,6 +135,20 @@ namespace hades
         static void key_column_list(std::ostream& os)
         {
             attribute_list<Keys...>::column_list(os);
+        }
+
+        /*!
+         * \brief Generate a where clause that will match tuples having this
+         * id.
+         */
+        hades::detail::where<
+            hades::int_row<hades::tuple<Keys...>::arity>> where() const
+        {
+            const hades::tuple<Keys...>& t =
+                static_cast<const hades::tuple<Keys...>&>(*this);
+            std::ostringstream oss;
+            key_where_clause(oss);
+            return hades::where(oss.str(), t.to_int_row());
         }
     private:
         template<

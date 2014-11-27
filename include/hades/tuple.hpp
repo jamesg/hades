@@ -67,10 +67,16 @@ namespace hades
                 styx::object_accessor(e)
             {
             }
-            hades::string_row<arity> to_string_row()
+            hades::string_row<arity> to_string_row() const
             {
                 hades::string_row<arity> out;
-                copy_to_row(out);
+                copy_to_row<std::string>(out);
+                return out;
+            }
+            hades::int_row<arity> to_int_row() const
+            {
+                hades::int_row<arity> out;
+                copy_to_row<int>(out);
                 return out;
             }
             /*!
@@ -174,13 +180,37 @@ namespace hades
                 bind_values_<Start, Attributes...>(stmt);
             }
 
+            template<typename Type, typename Row>
+            struct copier
+            {
+                copier(const tuple<Attributes...> *const t) :
+                    m_t(t)
+                {
+                }
+                void operator()(Row& out)
+                {
+                    m_t->copy_to_row_<Type, Row, 0, Attributes...>(out);
+                }
+                const tuple<Attributes...> *const m_t;
+            };
+            template<typename Type>
+            struct copier<Type, hades::row<>>
+            {
+                copier(const tuple<Attributes...> *const)
+                {
+                }
+                void operator()(hades::row<>&)
+                {
+                }
+            };
+
             /*!
              * \brief Copy values to a hades::row.
              */
-            template<typename Row>
+            template<typename Type, typename Row>
             void copy_to_row(Row& out) const
             {
-                copy_to_row_<Row, 0, Attributes...>(out);
+                copier<Type, Row>(this)(out);
             }
 
             /*!
@@ -245,6 +275,7 @@ namespace hades
             }
 
             template<
+                    typename Type,
                     typename Row,
                     int Start,
                     const char *Attr1,
@@ -252,14 +283,14 @@ namespace hades
                     const char *...Attrs>
             void copy_to_row_(Row& out) const
             {
-                copy_to_row_<Row, Start, Attr1>(out);
-                copy_to_row_<Row, Start+1, Attr2, Attrs...>(out);
+                copy_to_row_<Type, Row, Start, Attr1>(out);
+                copy_to_row_<Type, Row, Start+1, Attr2, Attrs...>(out);
             }
 
-            template<typename Row, int Index, const char *Attr>
+            template<typename Type, typename Row, int Index, const char *Attr>
             void copy_to_row_(Row& out) const
             {
-                hades::column<Index, Row>(out) = copy_attr<Attr, std::string>();
+                hades::column<Index, Row>(out) = copy_attr<Attr, Type>();
             }
 
             template<

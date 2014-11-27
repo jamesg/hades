@@ -13,6 +13,7 @@
 #include "hades/connection.hpp"
 #include "hades/crud/get_flags.ipp"
 #include "hades/exception.hpp"
+#include "hades/get_one.hpp"
 #include "hades/mkstr.hpp"
 #include "hades/retrieve_values.hpp"
 #include "hades/transaction.hpp"
@@ -29,78 +30,17 @@ namespace hades
      * the database relation.
      */
     template<typename Out>
-    void get_by_id(
-            connection& conn,
-            typename Out::id_type id,
-            Out& out
-            )
-    {
-        hades::transaction transaction(conn, "hades_get_by_id");
-        std::vector<Out> out_vector;
-        std::ostringstream oss;
-        oss << "SELECT ";
-        styx::serialise(
-                Out::attribute_list_type::to_vector(),
-                [](const char *s, std::ostream& os) {
-                    os << s;
-                },
-                ", ",
-                oss
-                );
-        oss << " FROM " << Out::relation_name;
-        oss << " WHERE ";
-        Out::id_type::key_where_clause(oss);
-#ifdef HADES_ENABLE_DEBUGGING
-        std::cerr << "hades get_by_id query: " << oss. str() << std::endl;
-#endif
-
-        sqlite3_stmt *stmt = nullptr;
-        if(
-                sqlite3_prepare(
-                    conn.handle(),
-                    oss.str().c_str(),
-                    oss.str().length(),
-                    &stmt,
-                    nullptr
-                    ) != SQLITE_OK
-                )
-        {
-            throw hades::exception(
-                mkstr() << "error in SQLite select; query: \"" << oss.str() <<
-                    "\" sqlite error: " << sqlite3_errmsg(conn.handle())
-                    );
-        }
-
-        // First parameter is index 1.
-        Out::id_type::bind_key_values(id, stmt);
-
-        if(sqlite3_step(stmt) == SQLITE_ROW)
-        {
-            Out::attribute_list_type::retrieve_values(stmt, out);
-        }
-        else
-        {
-            sqlite3_finalize(stmt);
-            throw hades::exception(
-                    mkstr() << "SELECT did not yield one row: \"" <<
-                        oss.str() << "\""
-                        );
-        }
-
-        if( sqlite3_finalize(stmt) != SQLITE_OK )
-            throw hades::exception("finalizing sqlite statement");
-
-        detail::get_flags<Out>(conn, out);
-    }
-
-    template<typename Out>
     Out get_by_id(
             connection& conn,
             typename Out::id_type id
             )
     {
-        Out out;
-        get_by_id(conn, id, out);
+        hades::transaction transaction(conn, "hades_get_by_id");
+        Out out = hades::get_one<Out>(
+                conn,
+                id.where()
+                );
+        detail::get_flags<Out>(conn, out);
         return out;
     }
 }

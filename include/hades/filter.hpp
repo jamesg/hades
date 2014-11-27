@@ -52,8 +52,7 @@ namespace hades
                     m_values(hades::row<>())
                 {
                 }
-                template<typename ...Values>
-                where(const std::string& clause_, Row values) :
+                where(const std::string& clause_, const Row& values) :
                     m_clause(clause_),
                     m_values(values)
                 {
@@ -86,21 +85,44 @@ namespace hades
                 {
                     return m_clause;
                 }
+                Row values() const
+                {
+                    return m_values;
+                }
             private:
                 const std::string m_clause;
                 Row m_values;
         };
 
-        namespace result_of
+        template<typename X, typename Y>
+        class and_ : public basic_where
         {
-            template<typename X, typename Y>
-            using and_ = detail::where<
-                    boost::fusion::result_of::join<
-                        typename X::values_type,
-                        typename Y::values_type
-                        >
-                    >;
-        }
+            public:
+                and_(const X& x, const Y& y) :
+                    m_x(x),
+                    m_y(y)
+                {
+                }
+                std::string clause() const override
+                {
+                    return mkstr() << "WHERE (" << m_x.basic_clause() <<
+                        ") AND (" << m_y.basic_clause() << ")";
+                }
+                void bind(sqlite3_stmt *stmt) const override
+                {
+                    bind_values(
+                            boost::fusion::join(m_x.values(), m_y.values()),
+                            stmt
+                            );
+                }
+                std::unique_ptr<basic_where> clone() const override
+                {
+                    return std::unique_ptr<and_<X, Y>>(new and_(m_x, m_y));
+                }
+            private:
+                X m_x;
+                Y m_y;
+        };
     }
 
     /*!
@@ -129,13 +151,9 @@ namespace hades
      * \param Y a hades::detail::where.
      */
     template<typename X, typename Y>
-    detail::result_of::and_<X, Y> and_(const X& x, const Y& y)
+    typename detail::and_<X, Y> and_(const X& x, const Y& y)
     {
-        return detail::result_of::and_<X, Y>(
-                mkstr() << "(" << x.basic_clause() <<
-                    ") AND (" << y.basic_clause() << ")",
-                boost::fusion::join(x.values(), y.values())
-                );
+        return detail::and_<X, Y>(x, y);
     }
 
     /*!

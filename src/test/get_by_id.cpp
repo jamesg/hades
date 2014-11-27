@@ -32,16 +32,17 @@ namespace
         public hades::tuple<attribute::site_id, attribute::name>,
         public hades::has_candidate_key<attribute::site_id>
     {
-        site(styx::element& o) :
+        site()
+        {
+        }
+        site(const styx::element& o) :
             styx::object_accessor(o)
         {
         }
-
         int& site_id()
         {
             return key<attribute::site_id>();
         }
-
         std::string& name()
         {
             return get_string<attribute::name>();
@@ -53,21 +54,21 @@ namespace
         public hades::tuple<attribute::site_id, attribute::device_id, attribute::name>,
         public hades::has_candidate_key<attribute::site_id, attribute::device_id>
     {
-        device(styx::element& o) :
+        device()
+        {
+        }
+        device(const styx::element& o) :
             styx::object_accessor(o)
         {
         }
-
         int& site_id()
         {
             return key<attribute::site_id>();
         }
-
         int& device_id()
         {
             return key<attribute::device_id>();
         }
-
         std::string& name()
         {
             return get_string<attribute::name>();
@@ -96,13 +97,7 @@ SCENARIO("db::get_by_id") {
                     );
 
             THEN("get_by_id returns the tuple") {
-                styx::element site_obj;
-                site s(site_obj);
-                hades::get_by_id(
-                        conn,
-                        site::id_type{1},
-                        s
-                        );
+                site s = hades::get_by_id<site>(conn, site::id_type{1});
                 REQUIRE(s.site_id() == 1);
             }
         }
@@ -133,13 +128,8 @@ SCENARIO("db::get_by_id") {
                     );
 
             THEN("get_by_id returns the tuple") {
-                styx::element site_obj;
-                device d(site_obj);
-                hades::get_by_id(
-                        conn,
-                        device::id_type{1, 1},
-                        d
-                        );
+                device d =
+                    hades::get_by_id<device>(conn, device::id_type{1, 1});
                 REQUIRE(d.site_id() == 1);
                 REQUIRE(d.device_id() == 1);
                 REQUIRE(d.name() == "name");
@@ -162,13 +152,8 @@ SCENARIO("db::get_by_id") {
                     );
 
             THEN("get_by_id returns the tuple") {
-                styx::element site_obj;
-                device d(site_obj);
-                hades::get_by_id(
-                        conn,
-                        device::id_type{2, 2},
-                        d
-                        );
+                device d =
+                    hades::get_by_id<device>(conn, device::id_type{2, 2});
                 REQUIRE(d.site_id() == 2);
                 REQUIRE(d.device_id() == 2);
                 REQUIRE(d.name() == "name2");
