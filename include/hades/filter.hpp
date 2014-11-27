@@ -3,6 +3,8 @@
 
 #include <memory>
 
+#include <boost/fusion/include/join.hpp>
+
 #include "hades/bind_values.hpp"
 #include "hades/mkstr.hpp"
 #include "hades/row.hpp"
@@ -12,79 +14,133 @@ namespace hades
     class basic_filter
     {
         public:
+            /*!
+             * \brief Bind stored parameters to the SQLite statement starting
+             * at the leftmost index (1).
+             */
             virtual void bind(sqlite3_stmt *stmt) const = 0;
+            /*!
+             * \brief Retrieve the clause representing this filter.  It should
+             * be added to the end of the SQL query.
+             */
             virtual std::string clause() const = 0;
     };
 
-    class basic_where_values
+    namespace detail
     {
-        public:
-            virtual void bind(sqlite3_stmt *stmt) const = 0;
-            virtual std::unique_ptr<basic_where_values> clone() const = 0;
-    };
-    template<typename ...Values>
-    class where_values :
-        public basic_where_values
-    {
-        public:
-            where_values(const hades::row<Values...> values) :
-                m_values(values)
-            {
-            }
-            void bind(sqlite3_stmt *stmt) const override
-            {
-                bind_values(m_values, stmt);
-            }
-            std::unique_ptr<basic_where_values> clone() const
-            {
-                return std::unique_ptr<basic_where_values>(
-                        new where_values(m_values)
-                        );
-            }
-        private:
-            hades::row<Values...> m_values;
-    };
+        class basic_where : public basic_filter
+        {
+            public:
+                virtual void bind(sqlite3_stmt *stmt) const = 0;
+                virtual std::string clause() const = 0;
+                virtual std::unique_ptr<basic_where> clone() const = 0;
+        };
+        /*!
+         * \brief An SQL WHERE clause.  Should be instantiated via an overload
+         * of hades::where rather than this template directly.
+         */
+        template<typename Row>
+        class where : public basic_where
+        {
+            public:
+                typedef Row values_type;
+                /*!
+                 * \brief A where clause which selects all tuples.
+                 */
+                where() :
+                    m_clause("1"),
+                    m_values(hades::row<>())
+                {
+                }
+                template<typename ...Values>
+                where(const std::string& clause_, Row values) :
+                    m_clause(clause_),
+                    m_values(values)
+                {
+                }
+                where(const std::string& clause_) :
+                    m_clause(clause_),
+                    m_values(hades::row<>())
+                {
+                }
+                where(const where<Row>& o) :
+                    m_clause(o.m_clause),
+                    m_values(o.m_values)
+                {
+                }
+                std::unique_ptr<basic_where> clone() const override
+                {
+                    return std::unique_ptr<basic_where>(
+                            new detail::where<Row>(*this)
+                            );
+                }
+                void bind(sqlite3_stmt *stmt) const override
+                {
+                    bind_values(m_values, stmt);
+                }
+                std::string clause() const override
+                {
+                    return mkstr() << " WHERE " << m_clause;
+                }
+                std::string basic_clause() const
+                {
+                    return m_clause;
+                }
+            private:
+                const std::string m_clause;
+                Row m_values;
+        };
 
-    class where : public basic_filter
-    {
-        public:
-            /*!
-             * \brief A where clause which selects all tuples.
-             */
-            where() :
-                m_clause("1"),
-                m_values(new where_values<>(hades::row<>()))
-            {
-            }
-            template<typename ...Values>
-            where(const std::string& clause_, hades::row<Values...> values) :
-                m_clause(clause_),
-                m_values(new where_values<Values...>(values))
-            {
-            }
-            where(const std::string& clause_) :
-                m_clause(clause_),
-                m_values(new where_values<>(hades::row<>()))
-            {
-            }
-            where(const where& o) :
-                m_clause(o.m_clause),
-                m_values(o.m_values->clone())
-            {
-            }
-            void bind(sqlite3_stmt *stmt) const override
-            {
-                m_values->bind(stmt);
-            }
-            std::string clause() const override
-            {
-                return mkstr() << " WHERE " << m_clause;
-            }
-        private:
-            const std::string m_clause;
-            std::unique_ptr<basic_where_values> m_values;
-    };
+        namespace result_of
+        {
+            template<typename X, typename Y>
+            using and_ = detail::where<
+                    boost::fusion::result_of::join<
+                        typename X::values_type,
+                        typename Y::values_type
+                        >
+                    >;
+        }
+    }
 
+    /*!
+     * \brief WHERE filter that accepts all tuples.
+     */
+    detail::where<hades::row<>> where();
+    /*!
+     * \brief WHERE filter with no substitution parameters.
+     */
+    detail::where<hades::row<>> where(const std::string& clause_);
+    /*!
+     * \brief WHERE filter with substitution parameters.  The parameters will
+     * be substituted by SQLite when the clause has been fully constructed.
+     */
+    template<typename Row>
+    detail::where<Row> where(const std::string& clause_, const Row& row)
+    {
+        return detail::where<Row>(clause_, row);
+    }
+
+    /*!
+     * \brief Build a WHERE clause that is a conjunction of two given WHERE
+     * clauses.
+     *
+     * \param X a hades::detail::where.
+     * \param Y a hades::detail::where.
+     */
+    template<typename X, typename Y>
+    detail::result_of::and_<X, Y> and_(const X& x, const Y& y)
+    {
+        return detail::result_of::and_<X, Y>(
+                mkstr() << "(" << x.basic_clause() <<
+                    ") AND (" << y.basic_clause() << ")",
+                boost::fusion::join(x.values(), y.values())
+                );
+    }
+
+    /*!
+     * \brief A filter comprising ORDER BY, LIMIT and OFFSET clauses.
+     */
     class order_by : public basic_filter
     {
         public:
@@ -94,12 +150,12 @@ namespace hades
                 m_offset(offset)
             {
             }
-            //order_by(const order_by& o) :
-                //m_clause(o.m_clause),
-                //m_limit(o.m_limit),
-                //m_offset(o.m_offset)
-            //{
-            //}
+            order_by(const order_by& o) :
+                m_clause(o.m_clause),
+                m_limit(o.m_limit),
+                m_offset(o.m_offset)
+            {
+            }
             std::string clause() const override
             {
                 hades::mkstr out;
@@ -112,31 +168,46 @@ namespace hades
             {
             }
         private:
-            const std::string m_clause;
-            const int m_limit, m_offset;
+            std::string m_clause;
+            int m_limit, m_offset;
     };
 
+    /*!
+     * \brief Filter comprising a WHERE clause and an ORDER BY/LIMIT/OFFSET
+     * clause.
+     */
     class filter : public basic_filter
     {
         public:
-            filter(const where& where_, const order_by& order_by_) :
-                m_where(where_),
+            filter(
+                    const detail::basic_where& where_,
+                    const order_by& order_by_
+                    ) :
+                m_where(where_.clone()),
                 m_order_by(order_by_)
             {
             }
+            filter(filter&& o) :
+                m_order_by(std::move(o.m_order_by))
+            {
+                m_where = std::move(o.m_where);
+            }
             std::string clause() const override
             {
-                return mkstr() << m_where.clause() << " " << m_order_by.clause();
+                return mkstr() << m_where->clause() << " " << m_order_by.clause();
             }
             void bind(sqlite3_stmt *stmt) const override
             {
-                m_where.bind(stmt);
+                m_where->bind(stmt);
             }
         private:
-            const where m_where;
+            std::unique_ptr<detail::basic_where> m_where;
             const order_by m_order_by;
     };
 
+    /*!
+     * \brief Filter accepting all tuples.
+     */
     class filter_all : public basic_filter
     {
         public:

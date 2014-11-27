@@ -17,19 +17,69 @@ namespace hades
     template<typename ...COLUMNS> using row =
         boost::fusion::vector<COLUMNS...>;
 
+    namespace detail
+    {
+        /*!
+         * \brief Extend a row of Types... by appending N copies of type Type.
+         * \param N number of times to extend the row.
+         * \param Type type to append to the row type list.
+         * \param ...Types current type list.
+         */
+        template<int N, typename Type, typename ...Types>
+        struct extend_row
+        {
+            typedef typename extend_row<N-1, Type, Types..., Type>::type type;
+        };
+        template<typename Type, typename ...Types>
+        struct extend_row<0, Type, Types...>
+        {
+            /*!
+             * \brief An instantiation of hades::row representing the extended
+             * type.
+             */
+            typedef hades::row<Types...> type;
+        };
+    }
+
     /*!
-     * Get the value of a column from a row.  The index of the column is a
-     * zero-based integer provided as the first template argument.
+     * \brief A row of std::string.
      *
-     * This function is an alias for boost::fusion::at_c, which provides
+     * \param N arity of the row.
+     */
+    template<int N> using string_row =
+        typename detail::extend_row<N, std::string>::type;
+
+    /*!
+     * \brief Get the value of a column from a row.  The index of the column is
+     * a zero-based integer provided as the first template argument.
+     *
+     * \note This function is an alias for boost::fusion::at_c, which provides
      * exactly the required functionality for a boost::fusion::vector (aliased
      * as hades::row).
      */
-    template <int N, typename SEQUENCE>
+    template<int N, typename SEQUENCE>
     inline typename boost::fusion::result_of::at_c<SEQUENCE const, N>::type
     column(SEQUENCE const& seq)
     {
-        return boost::fusion::at<boost::mpl::int_<N> >(seq);
+        return boost::fusion::at<boost::mpl::int_<N>>(seq);
+    }
+
+    /*!
+     * \brief Get the value of a column from a row.  The index of the column is
+     * a zero-based integer provided as the first template argument.
+     *
+     * \note This function is an alias for boost::fusion::at_c, which provides
+     * exactly the required functionality for a boost::fusion::vector (aliased
+     * as hades::row).
+     *
+     * \note This is the non-const version of the function, returning a
+     * non-const reference.
+     */
+    template<int N, typename SEQUENCE>
+    inline typename boost::fusion::result_of::at_c<SEQUENCE, N>::type
+    column(SEQUENCE& seq)
+    {
+        return boost::fusion::at<boost::mpl::int_<N>>(seq);
     }
 
     /*!

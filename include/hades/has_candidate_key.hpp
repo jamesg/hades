@@ -5,8 +5,9 @@
 
 #include "styx/object_accessor.hpp"
 
-#include "compound_id.hpp"
-#include "detail/has_key_attr.hpp"
+#include "hades/compound_id.hpp"
+#include "hades/detail/has_key_attr.hpp"
+#include "hades/row.hpp"
 
 namespace hades
 {

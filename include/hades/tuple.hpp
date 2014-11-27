@@ -8,6 +8,7 @@
 
 #include "hades/attribute_list.hpp"
 #include "hades/detail/has_attribute.hpp"
+#include "hades/row.hpp"
 
 namespace hades
 {
@@ -17,8 +18,8 @@ namespace hades
     namespace detail
     {
         /*!
-         * Get the attribute named 'Attribute' from a tuple.  Will only be
-         * instantiated if the tuple type inherits from
+         * \brief Get the attribute named 'Attribute' from a tuple.
+         * \note Will only be instantiated if the tuple type inherits from
          * has_attribute<Attribute>.
          */
         template<typename TupleType, const char *Attribute, typename Out>
@@ -30,6 +31,17 @@ namespace hades
         get_attribute(TupleType& tuple)
         {
             return tuple.template get<Out&>(Attribute);
+        }
+        /*!
+         * \brief Copy the attribute named 'Attribute' from a tuple.
+         * \note Will only be instantiated if the tuple type inherits from
+         * has_attribute<Attribute>.
+         */
+        template<typename TupleType, const char *Attribute, typename Out>
+        Out
+        copy_attribute(const TupleType& tuple)
+        {
+            return tuple.template copy<Out>(Attribute);
         }
     }
 
@@ -47,12 +59,19 @@ namespace hades
         public virtual styx::object_accessor
     {
         public:
+            static constexpr const size_t arity = sizeof...(Attributes);
             tuple()
             {
             }
             tuple(const styx::element& e) :
                 styx::object_accessor(e)
             {
+            }
+            hades::string_row<arity> to_string_row()
+            {
+                hades::string_row<arity> out;
+                copy_to_row(out);
+                return out;
             }
             /*!
              * \brief Extend this tuple type by appending one attribute to the
@@ -66,8 +85,6 @@ namespace hades
              */
             typedef attribute_list<Attributes...> attribute_list_type;
 
-            static constexpr const size_t arity = sizeof...(Attributes);
-
             /*!
              * \brief Get a reference to one of the attributes in the
              * tuple.
@@ -79,6 +96,20 @@ namespace hades
             Out& get_attr()
             {
                 return detail::get_attribute<
+                    tuple<Attributes...>,
+                    Attr,
+                    Out>(*this);
+            }
+            /*!
+             * \brief Get the value of one of the attributes in the tuple.
+             *
+             * \note This function can only be instantiated if Attr is a member
+             * of Attributes.
+             */
+            template<const char *Attr, typename Out>
+            Out copy_attr() const
+            {
+                return detail::copy_attribute<
                     tuple<Attributes...>,
                     Attr,
                     Out>(*this);
@@ -144,6 +175,15 @@ namespace hades
             }
 
             /*!
+             * \brief Copy values to a hades::row.
+             */
+            template<typename Row>
+            void copy_to_row(Row& out) const
+            {
+                copy_to_row_<Row, 0, Attributes...>(out);
+            }
+
+            /*!
              * \brief Bind the values in the tuple, in order, to the SQLite
              * statement.  Only attributes with values will be bound (so the
              * number of bound values may not match the number of attributes).
@@ -187,7 +227,11 @@ namespace hades
                     out.push_back(Attr);
             }
 
-            template<int Index, const char *Attr1, const char *Attr2, const char *...Attrs>
+            template<
+                    int Index,
+                    const char *Attr1,
+                    const char *Attr2,
+                    const char *...Attrs>
             void bind_values_(sqlite3_stmt *stmt)
             {
                 bind_values_<Index, Attr1>(stmt);
@@ -200,7 +244,29 @@ namespace hades
                 hades::bind_any(Index, get<styx::element>(Attr), stmt);
             }
 
-            template<int Index, const char *Attr1, const char *Attr2, const char *...Attrs>
+            template<
+                    typename Row,
+                    int Start,
+                    const char *Attr1,
+                    const char *Attr2,
+                    const char *...Attrs>
+            void copy_to_row_(Row& out) const
+            {
+                copy_to_row_<Row, Start, Attr1>(out);
+                copy_to_row_<Row, Start+1, Attr2, Attrs...>(out);
+            }
+
+            template<typename Row, int Index, const char *Attr>
+            void copy_to_row_(Row& out) const
+            {
+                hades::column<Index, Row>(out) = copy_attr<Attr, std::string>();
+            }
+
+            template<
+                    int Index,
+                    const char *Attr1,
+                    const char *Attr2,
+                    const char *...Attrs>
             void bind_set_values_(sqlite3_stmt *stmt)
             {
                 if(has_key(Attr1))
