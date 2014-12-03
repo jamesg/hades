@@ -8,6 +8,7 @@
 
 #include "hades/connection.hpp"
 #include "hades/mkstr.hpp"
+#include "styx/serialisers/vector.hpp"
 
 template<typename Tuple>
 bool hades::crud<Tuple>::exists(connection& conn)
