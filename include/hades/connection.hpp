@@ -26,6 +26,10 @@ namespace hades
          * exception if the connection could not be established.
          */
         connection(std::string filename);
+        /*!
+         * \brief Move a SQLite connection.  The old connection object will no
+         * longer be connected to a database.
+         */
         connection(connection&& o);
         ~connection();
         /*!
@@ -44,6 +48,8 @@ namespace hades
          */
         transaction *peek2_transaction();
     private:
+        void enable_foreign_keys();
+
         sqlite3 *m_handle;
         std::list<transaction*> m_transactions;
     };

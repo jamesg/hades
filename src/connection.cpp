@@ -14,8 +14,12 @@ hades::connection hades::connection::in_memory_database()
 hades::connection::connection(std::string filename) :
     m_handle(nullptr)
 {
-    // Attempt to open a connection
-    if(sqlite3_open(filename.c_str(), &m_handle) != SQLITE_OK)
+    auto err = sqlite3_open(filename.c_str(), &m_handle);
+    if(err == SQLITE_OK)
+    {
+        enable_foreign_keys();
+    }
+    else
     {
         if(m_handle)
         {
@@ -25,29 +29,11 @@ hades::connection::connection(std::string filename) :
         throw hades::exception("Unable to open SQLite connection");
     }
 
-    // Enable foreign keys
-    sqlite3_stmt *stmt = nullptr;
-    sqlite3_prepare(m_handle, "PRAGMA foreign_keys = ON", -1, &stmt, nullptr);
-    int ret = sqlite3_step(stmt);
-    int finalise_ret = sqlite3_finalize(stmt);
-    if(ret != SQLITE_DONE && ret != SQLITE_OK)
-    {
-        throw hades::exception(
-            mkstr() << "enabling foreign key processing: " <<
-                sqlite3_errmsg(m_handle)
-            );
-    }
-    if(finalise_ret != SQLITE_OK)
-        throw hades::exception(
-            mkstr() << "finalising query to enable foreign key processing: " <<
-                sqlite3_errmsg(m_handle)
-            );
 }
 
-hades::connection::connection(connection&& o) /*:*/
-    //m_handle(o.m_handle)
+hades::connection::connection(connection&& o) :
+    m_handle(o.m_handle)
 {
-    m_handle = o.m_handle;
     o.m_handle = nullptr;
 }
 
@@ -89,5 +75,25 @@ hades::transaction *hades::connection::peek2_transaction()
     if(it != m_transactions.end())
         return *it;
     return nullptr;
+}
+
+void hades::connection::enable_foreign_keys()
+{
+    sqlite3_stmt *stmt = nullptr;
+    sqlite3_prepare(m_handle, "PRAGMA foreign_keys = ON", -1, &stmt, nullptr);
+    int ret = sqlite3_step(stmt);
+    int finalise_ret = sqlite3_finalize(stmt);
+    if(ret != SQLITE_DONE && ret != SQLITE_OK)
+    {
+        throw hades::exception(
+            mkstr() << "enabling foreign key processing: " <<
+                sqlite3_errmsg(m_handle)
+            );
+    }
+    if(finalise_ret != SQLITE_OK)
+        throw hades::exception(
+            mkstr() << "finalising query to enable foreign key processing: " <<
+                sqlite3_errmsg(m_handle)
+            );
 }
 
