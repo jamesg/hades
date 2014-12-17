@@ -7,6 +7,8 @@
 
 #include <sqlite3.h>
 
+#include "styx/list.hpp"
+#include "styx/object.hpp"
 #include "hades/connection.hpp"
 #include "hades/exception.hpp"
 #include "hades/filter.hpp"
@@ -133,7 +135,7 @@ namespace hades
             {
                 Tuple out;
                 Tuple::attribute_list_type::retrieve_values(stmt, out);
-                list.append(out.get_element());
+                list.append(out);
             }
             catch(const std::exception&)
             {

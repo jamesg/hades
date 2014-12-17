@@ -7,7 +7,7 @@
 #include "hades/detail/basic_has_flags.hpp"
 #include "hades/detail/has_attribute.hpp"
 #include "hades/flag.hpp"
-#include "styx/object_accessor.hpp"
+#include "styx/object.hpp"
 
 namespace hades
 {
@@ -16,7 +16,7 @@ namespace hades
         template<const char *Flag>
         struct has_flag :
             public has_attribute<Flag>,
-            virtual styx::object_accessor
+            virtual styx::object
         {
             template<typename Tuple>
             void save_flag(Tuple& t, connection& conn)
@@ -52,7 +52,7 @@ namespace hades
     struct has_flags :
         public detail::has_flag<Keys>...,
         public detail::basic_has_flags,
-        virtual styx::object_accessor
+        virtual styx::object
     {
         template<typename Tuple>
         void get_flags(connection& conn, Tuple& t)

@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "styx/object_accessor.hpp"
+#include "styx/object.hpp"
 
 #include "hades/attribute_list.hpp"
 #include "hades/crud.hpp"

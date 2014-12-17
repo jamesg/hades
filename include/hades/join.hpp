@@ -125,7 +125,7 @@ namespace hades
 
         //
         // retrieve_tuple_values: Retrieve values from a SQLite statement and
-        // record them in an object_accessor.  Values are retrieved starting at
+        // record them in an object.  Values are retrieved starting at
         // an index supplied as the first template parameter.
         //
         // Again, there are two versions.  The flag version gets the boolean
@@ -138,7 +138,7 @@ namespace hades
         typename std::enable_if<std::is_base_of<detail::basic_flag, Flag>::value>::type
         retrieve_tuple_values(
                 sqlite3_stmt *stmt,
-                styx::object_accessor& accessor
+                styx::object& accessor
                 )
         {
             int out = 0;
@@ -155,7 +155,7 @@ namespace hades
         typename std::enable_if<!std::is_base_of<detail::basic_flag, Tuple>::value>::type
         retrieve_tuple_values(
                 sqlite3_stmt *stmt,
-                styx::object_accessor& accessor
+                styx::object& accessor
                 )
         {
             typedef typename Tuple::attribute_list_type attrl;
@@ -205,7 +205,7 @@ namespace hades
         {
             static void retrieve_join_values(
                     sqlite3_stmt *stmt,
-                    styx::object_accessor& accessor
+                    styx::object& accessor
                     )
             {
                 retrieve_join_values_<0, Relations...>(stmt, accessor);
@@ -214,7 +214,7 @@ namespace hades
             template<int Start, typename Rel>
             static void retrieve_join_values_(
                     sqlite3_stmt *stmt,
-                    styx::object_accessor& accessor
+                    styx::object& accessor
                     )
             {
                 retrieve_tuple_values<Start, Rel>(stmt, accessor);
@@ -223,7 +223,7 @@ namespace hades
             template<int Start, typename Rel1, typename Rel2, typename ...Rels>
             static void retrieve_join_values_(
                     sqlite3_stmt *stmt,
-                    styx::object_accessor& accessor
+                    styx::object& accessor
                     )
             {
                 retrieve_join_values_<Start, Rel1>(stmt, accessor);
@@ -268,12 +268,12 @@ namespace hades
             {
                 try
                 {
-                    styx::object_accessor accessor;
+                    styx::object object;
                     detail::join_values<Tuples...>::retrieve_join_values(
                             stmt,
-                            accessor
+                            object
                             );
-                    list.append(accessor.get_element());
+                    list.append(styx::element(object));
                 }
                 catch(const std::exception&)
                 {

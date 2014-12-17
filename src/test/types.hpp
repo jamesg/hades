@@ -7,7 +7,7 @@
 #include "hades/has_candidate_key.hpp"
 #include "hades/relation.hpp"
 #include "hades/tuple.hpp"
-#include "styx/object_accessor.hpp"
+#include "styx/object.hpp"
 
 namespace hades
 {
@@ -49,7 +49,7 @@ namespace hades
             {
             }
             site(const styx::element& o) :
-                styx::object_accessor(o)
+                styx::object(o)
             {
             }
 
@@ -76,7 +76,7 @@ namespace hades
             {
             }
             site_location(const styx::element& o) :
-                styx::object_accessor(o)
+                styx::object(o)
             {
             }
             std::string& city()
@@ -95,7 +95,7 @@ namespace hades
             {
             }
             device(const styx::element& o) :
-                styx::object_accessor(o)
+                styx::object(o)
             {
             }
 

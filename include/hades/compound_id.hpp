@@ -5,7 +5,7 @@
 
 #include "styx/element.hpp"
 #include "styx/styx.hpp"
-#include "styx/object_accessor.hpp"
+#include "styx/object.hpp"
 
 #include "hades/attribute_list.hpp"
 #include "hades/detail/has_key_attr.hpp"
@@ -18,10 +18,10 @@ namespace hades
     namespace detail
     {
         /*!
-         * \brief Initialise a styx::object_accessor with values from a
+         * \brief Initialise a styx::object with values from a
          * std::initializer_list.
          *
-         * \param CompoundIdMap A styx::object_accessor derived type which also
+         * \param CompoundIdMap A styx::object derived type which also
          * inherits from detail::has_key_attr<Attr> for each attribute in the
          * Keys list.
          */
@@ -47,7 +47,7 @@ namespace hades
 
         /*!
          * \brief Initialise a compound_id_map (specialisation of
-         * styx::object_accessor) with values.
+         * styx::object) with values.
          */
         template<typename CompoundIdMap, const char *Key1>
         void copy_id_list(
@@ -100,11 +100,11 @@ namespace hades
                     );
         }
         compound_id(const styx::element& e) :
-            styx::object_accessor(e)
+            styx::object(e)
         {
         }
         compound_id(const compound_id& m) :
-            styx::object_accessor(m.get_element())
+            styx::object(m)
         {
         }
 

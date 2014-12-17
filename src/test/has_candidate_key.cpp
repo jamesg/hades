@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "styx/object_accessor.hpp"
+#include "styx/object.hpp"
 
 #include "hades/has_candidate_key.hpp"
 
@@ -13,7 +13,7 @@ namespace
         public hades::has_candidate_key<device_id_cstr, site_id_cstr>
     {
         device(styx::element& o) :
-            styx::object_accessor(o)
+            styx::object(o)
         {
         }
     };

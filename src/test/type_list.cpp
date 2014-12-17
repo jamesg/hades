@@ -31,7 +31,7 @@ namespace
         public hades::has_candidate_key<attribute::site::site_id>
     {
         site(styx::element& o) :
-            styx::object_accessor(o)
+            styx::object(o)
         {
         }
 

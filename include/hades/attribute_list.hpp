@@ -8,7 +8,7 @@
 
 #include "hades/bind_values.hpp"
 #include "hades/get_column.hpp"
-#include "styx/object_accessor.hpp"
+#include "styx/object.hpp"
 
 namespace hades
 {
@@ -96,15 +96,15 @@ namespace hades
          * SQLite will convert other types to strings as required.
          */
         template<int Start=0>
-        static void retrieve_values(sqlite3_stmt *stmt, styx::object_accessor& out)
+        static void retrieve_values(sqlite3_stmt *stmt, styx::object& out)
         {
             // 0 is the first index when retrieving values.
             retrieve_values_<Start, Attributes...>(stmt, out);
         }
 
         static void copy_attributes(
-                styx::object_accessor& from,
-                styx::object_accessor& to
+                styx::object& from,
+                styx::object& to
                 )
         {
             copy_attributes_<Attributes...>(from, to);
@@ -116,30 +116,30 @@ namespace hades
             equijoin_on_clause_<Relation1, Relation2, Attributes...>(out);
         }
 
-        static bool all_attributes_set(styx::object_accessor& obj)
+        static bool all_attributes_set(styx::object& obj)
         {
             return all_attributes_set_<Attributes...>(obj);
         }
 
         static bool less_than(
-                const styx::object_accessor& x,
-                const styx::object_accessor& y
+                const styx::object& x,
+                const styx::object& y
                 )
         {
             return less_than_<Attributes...>(x, y);
         }
 
         static bool equal(
-                const styx::object_accessor& x,
-                const styx::object_accessor& y
+                const styx::object& x,
+                const styx::object& y
                 )
         {
             return equal_<Attributes...>(x, y);
         }
 
         static bool not_equal(
-                const styx::object_accessor& x,
-                const styx::object_accessor& y
+                const styx::object& x,
+                const styx::object& y
                 )
         {
             return not_equal_<Attributes...>(x, y);
@@ -192,14 +192,14 @@ namespace hades
         }
 
         template<int Index, const char *Attr1, const char *Attr2, const char *...Attrs>
-        static void retrieve_values_(sqlite3_stmt *stmt, styx::object_accessor& out)
+        static void retrieve_values_(sqlite3_stmt *stmt, styx::object& out)
         {
             retrieve_values_<Index, Attr1>(stmt, out);
             retrieve_values_<Index+1, Attr2, Attrs...>(stmt, out);
         }
 
         template<int Index, const char *Attr>
-        static void retrieve_values_(sqlite3_stmt *stmt, styx::object_accessor& out)
+        static void retrieve_values_(sqlite3_stmt *stmt, styx::object& out)
         {
             const char *value = hades::get_column_text(stmt, Index);
 #ifdef HADES_ENABLE_DEBUGGING
@@ -213,14 +213,14 @@ namespace hades
         }
 
         template<int Index>
-        static void retrieve_values_(sqlite3_stmt *stmt, styx::object_accessor& out)
+        static void retrieve_values_(sqlite3_stmt *stmt, styx::object& out)
         {
         }
 
         template<const char *Attr1, const char *Attr2, const char *...Attrs>
         static void copy_attributes_(
-                styx::object_accessor& from,
-                styx::object_accessor& to
+                styx::object& from,
+                styx::object& to
                 )
         {
             copy_attributes_<Attr1>(from, to);
@@ -229,8 +229,8 @@ namespace hades
 
         template<const char *Attr>
         static void copy_attributes_(
-                styx::object_accessor& from,
-                styx::object_accessor& to
+                styx::object& from,
+                styx::object& to
                 )
         {
             to.get_element(Attr) = from.get_element(Attr);
@@ -256,13 +256,13 @@ namespace hades
         }
 
         template<const char *Attr1>
-        static bool all_attributes_set_(styx::object_accessor& obj)
+        static bool all_attributes_set_(styx::object& obj)
         {
             return obj.has_key(Attr1);
         }
 
         template<const char *Attr1, const char *Attr2, const char *...Attrs>
-        static bool all_attributes_set_(styx::object_accessor& obj)
+        static bool all_attributes_set_(styx::object& obj)
         {
             return all_attributes_set_<Attr1>(obj) &&
                 all_attributes_set_<Attr2, Attrs...>(obj);
@@ -270,8 +270,8 @@ namespace hades
 
         template<const char *Attr1>
         static bool less_than_(
-                const styx::object_accessor& x,
-                const styx::object_accessor& y
+                const styx::object& x,
+                const styx::object& y
                 )
         {
             return x.copy_string(Attr1) < y.copy_string(Attr1);
@@ -279,8 +279,8 @@ namespace hades
 
         template<const char *Attr1, const char *Attr2, const char *...Attrs>
         static bool less_than_(
-                const styx::object_accessor& x,
-                const styx::object_accessor& y
+                const styx::object& x,
+                const styx::object& y
                 )
         {
             if(less_than_<Attr1>(x, y))
@@ -290,8 +290,8 @@ namespace hades
 
         template<const char *Attr1>
         static bool equal_(
-                const styx::object_accessor& x,
-                const styx::object_accessor& y
+                const styx::object& x,
+                const styx::object& y
                 )
         {
             return x.copy_string(Attr1) == y.copy_string(Attr1);
@@ -299,8 +299,8 @@ namespace hades
 
         template<const char *Attr1, const char *Attr2, const char *...Attrs>
         static bool equal_(
-                const styx::object_accessor& x,
-                const styx::object_accessor& y
+                const styx::object& x,
+                const styx::object& y
                 )
         {
             if(equal_<Attr1>(x, y))
@@ -310,8 +310,8 @@ namespace hades
 
         template<const char *Attr1>
         static bool not_equal_(
-                const styx::object_accessor& x,
-                const styx::object_accessor& y
+                const styx::object& x,
+                const styx::object& y
                 )
         {
             return x.copy_string(Attr1) != y.copy_string(Attr1);
@@ -319,8 +319,8 @@ namespace hades
 
         template<const char *Attr1, const char *Attr2, const char *...Attrs>
         static bool not_equal_(
-                const styx::object_accessor& x,
-                const styx::object_accessor& y
+                const styx::object& x,
+                const styx::object& y
                 )
         {
             if(not_equal_<Attr1>(x, y))
@@ -333,13 +333,13 @@ namespace hades
     void attribute_list<>::column_list(std::ostream&);
     template<>
     void attribute_list<>::copy_attributes(
-        styx::object_accessor&,
-        styx::object_accessor&
+        styx::object&,
+        styx::object&
         );
     template<>
     std::vector<const char*> attribute_list<>::to_vector();
     template<>
-    bool attribute_list<>::all_attributes_set(styx::object_accessor& obj);
+    bool attribute_list<>::all_attributes_set(styx::object& obj);
 }
 
 #endif

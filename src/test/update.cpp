@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "styx/object_accessor.hpp"
+#include "styx/object.hpp"
 
 #include "hades/attribute_list.hpp"
 #include "hades/crud.hpp"
@@ -35,7 +35,7 @@ namespace
         {
         }
         site(const styx::element& o) :
-            styx::object_accessor(o)
+            styx::object(o)
         {
         }
 

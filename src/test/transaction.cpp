@@ -34,7 +34,7 @@ namespace
         }
 
         site(styx::element& o) :
-            styx::object_accessor(o)
+            styx::object(o)
         {
         }
 

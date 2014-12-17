@@ -3,7 +3,7 @@
 
 #include <type_traits>
 
-#include "styx/object_accessor.hpp"
+#include "styx/object.hpp"
 
 namespace hades
 {
@@ -26,7 +26,7 @@ namespace hades
          */
         template<const char *Attribute>
         class has_key_attr :
-            public virtual styx::object_accessor
+            public virtual styx::object
         {
             public:
                 has_key_attr()
@@ -34,7 +34,7 @@ namespace hades
                 }
 
                 explicit has_key_attr(const styx::element& o) :
-                    styx::object_accessor(o)
+                    styx::object(o)
                 {
                 }
         };

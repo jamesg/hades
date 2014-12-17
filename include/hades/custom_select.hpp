@@ -7,7 +7,7 @@
 #include <sqlite3.h>
 
 #include "styx/list.hpp"
-#include "styx/object_accessor.hpp"
+#include "styx/object.hpp"
 #include "hades/attribute_list.hpp"
 #include "hades/bind_values.hpp"
 #include "hades/connection.hpp"
@@ -148,9 +148,9 @@ namespace hades
         styx::list list;
         while(sqlite3_step(stmt) == SQLITE_ROW)
         {
-            styx::object_accessor accessor;
-            attribute_list<Attributes...>::retrieve_values(stmt, accessor);
-            list.append(accessor.get_element());
+            styx::object object;
+            attribute_list<Attributes...>::retrieve_values(stmt, object);
+            list.append(object);
         }
 
         if(sqlite3_finalize(stmt) != SQLITE_OK)
@@ -197,9 +197,9 @@ namespace hades
         styx::list list;
         while(sqlite3_step(stmt) == SQLITE_ROW)
         {
-            styx::object_accessor accessor;
-            attribute_list<Attributes...>::retrieve_values(stmt, accessor);
-            list.append(accessor.get_element());
+            styx::object object;
+            attribute_list<Attributes...>::retrieve_values(stmt, object);
+            list.append(object);
         }
 
         if(sqlite3_finalize(stmt) != SQLITE_OK)

@@ -1,3 +1,5 @@
+#include "styx/list.hpp"
+#include "styx/object.hpp"
 #include "hades/attribute_list.hpp"
 
 template<>
@@ -7,8 +9,8 @@ void hades::attribute_list<>::column_list(std::ostream&)
 
 template<>
 void hades::attribute_list<>::copy_attributes(
-    styx::object_accessor&,
-    styx::object_accessor&
+    styx::object&,
+    styx::object&
     )
 {
 }
@@ -20,7 +22,7 @@ std::vector<const char*> hades::attribute_list<>::to_vector()
 }
 
 template<>
-bool hades::attribute_list<>::all_attributes_set(styx::object_accessor& obj)
+bool hades::attribute_list<>::all_attributes_set(styx::object& obj)
 {
     return true;
 }

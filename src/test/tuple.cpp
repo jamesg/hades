@@ -1,5 +1,7 @@
 #include "catch.hpp"
 
+#include "styx/list.hpp"
+#include "styx/object.hpp"
 #include "hades/tuple.hpp"
 
 namespace

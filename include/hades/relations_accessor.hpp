@@ -3,7 +3,7 @@
 
 #include <type_traits>
 
-#include "styx/object_accessor.hpp"
+#include "styx/object.hpp"
 #include "styx/styx.hpp"
 
 namespace hades
@@ -20,7 +20,7 @@ namespace hades
             std::is_base_of<has_relation<Attribute>, Accessor>::value,
             styx::element&
             >::type
-        get_element(styx::object_accessor& db)
+        get_element(styx::object& db)
         {
             return db.get_element(Attribute);
         }
@@ -33,7 +33,7 @@ namespace hades
     template<typename ...Relations>
     class relations_accessor :
         public detail::has_relation<(const char*)Relations::relation_name>...,
-        public styx::object_accessor
+        public styx::object
     {
         public:
             relations_accessor()
@@ -41,7 +41,7 @@ namespace hades
             }
 
             relations_accessor(styx::element& element) :
-                styx::object_accessor(element)
+                styx::object(element)
             {
             }
 

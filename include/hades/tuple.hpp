@@ -4,7 +4,7 @@
 #include <type_traits>
 
 #include "styx/element.hpp"
-#include "styx/object_accessor.hpp"
+#include "styx/object.hpp"
 
 #include "hades/attribute_list.hpp"
 #include "hades/detail/has_attribute.hpp"
@@ -50,13 +50,13 @@ namespace hades
      * can be stored in a relational database.
      *
      * \note This class should be extended (as well as virtual
-     * styx::object_accessor) to create accessor types for JSON objects that
+     * styx::object) to create accessor types for JSON objects that
      * can be stored in the database.
      */
     template<const char *...Attributes>
     class tuple :
         private detail::has_attribute<Attributes>...,
-        public virtual styx::object_accessor
+        public virtual styx::object
     {
         public:
             static constexpr const size_t arity = sizeof...(Attributes);
@@ -64,7 +64,7 @@ namespace hades
             {
             }
             tuple(const styx::element& e) :
-                styx::object_accessor(e)
+                styx::object(e)
             {
             }
             hades::string_row<arity> to_string_row() const
@@ -122,7 +122,7 @@ namespace hades
             }
 
             //
-            // Alternatives to styx::object_accessor's get_ functions,
+            // Alternatives to styx::object's get_ functions,
             // accepting the key as a template argument rather than a function
             // argument.  They offer no performance benefit; the only benefit
             // is that requests for invalid attributes can be made a

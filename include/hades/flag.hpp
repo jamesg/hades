@@ -1,7 +1,7 @@
 #ifndef HADES_FLAG_HPP
 #define HADES_FLAG_HPP
 
-#include "styx/object_accessor.hpp"
+#include "styx/object.hpp"
 #include "hades/crud.hpp"
 #include "hades/relation.hpp"
 
@@ -23,7 +23,7 @@ namespace hades
         public crud<flag<Id, Relation>>
     {
         flag(Id id_) :
-            styx::object_accessor(id_.get_element())
+            styx::object(id_)
         {
         }
     };

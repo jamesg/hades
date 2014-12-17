@@ -3,7 +3,7 @@
 
 #include <type_traits>
 
-#include "styx/object_accessor.hpp"
+#include "styx/object.hpp"
 
 #include "hades/compound_id.hpp"
 #include "hades/detail/has_key_attr.hpp"
@@ -29,7 +29,7 @@ namespace hades
     template<const char *...Attributes>
     class has_candidate_key :
         public virtual detail::has_key_attr<Attributes>...,
-        public virtual styx::object_accessor
+        public virtual styx::object
     {
         public:
             /*!
@@ -62,7 +62,7 @@ namespace hades
 
             id_type id()
             {
-                styx::element el = get_element();
+                styx::element el = *this;//get_element();
                 return id_type(el);
             }
 

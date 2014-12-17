@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "styx/object_accessor.hpp"
+#include "styx/object.hpp"
 
 #include "hades/attribute_list.hpp"
 #include "hades/custom_select.hpp"
@@ -30,7 +30,7 @@ namespace
         public hades::has_candidate_key<attribute::site_id>
     {
         site(styx::element& o) :
-            styx::object_accessor(o)
+            styx::object(o)
         {
         }
 
