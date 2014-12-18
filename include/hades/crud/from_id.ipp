@@ -11,7 +11,7 @@ void hades::crud<Tuple>::from_id(
         Id id
         )
 {
-    static_cast<Tuple&>(*this) = get_by_id<Tuple>(conn, id);
+    static_cast<Tuple&>(*this).m_map = get_by_id<Tuple>(conn, id).m_map;
 }
 
 #endif

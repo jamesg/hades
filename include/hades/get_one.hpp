@@ -1,6 +1,10 @@
 #ifndef HADES_GET_ONE_HPP
 #define HADES_GET_ONE_HPP
 
+#ifdef HADES_ENABLE_DEBUGGING
+#include <iostream>
+#endif
+
 #include <sqlite3.h>
 
 #include "hades/connection.hpp"
@@ -28,6 +32,11 @@ namespace hades
         Tuple::attribute_list_type::column_list(query);
         query << " FROM " << Tuple::relation_name;
         query << " " << filter.clause();
+
+#ifdef HADES_ENABLE_DEBUGGING
+        std::cerr << "hades::get_one query: \"" << query.str() << "\"" <<
+            std::endl;
+#endif
 
         sqlite3_stmt *stmt = nullptr;
         if(
