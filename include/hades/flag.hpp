@@ -14,6 +14,13 @@ namespace hades
         {
         };
     }
+    /*!
+     * \brief Tuple type representing a binary flag.
+     *
+     * Flags are indicated by the presence or absence of a tuple in the relvar
+     * named 'Relation', which has attributes matching the related tuple's
+     * candidate key.
+     */
     template<typename Id, const char *Relation>
     struct flag :
         public detail::basic_flag,

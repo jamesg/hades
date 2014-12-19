@@ -1,0 +1,14 @@
+#!/bin/sh
+if [ ! -d md.static ]
+then
+    mkdir md.static
+fi
+
+ls md | grep '\.md$' | sed -s 's/\.md$//' | while read file
+do
+    (
+        sh header.sh
+        markdown md/$file.md
+        sh footer.sh
+    ) > md.static/$file.html
+done

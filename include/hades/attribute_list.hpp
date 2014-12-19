@@ -26,6 +26,11 @@ namespace hades
         };
     }
 
+    /*!
+     * \brief Meta class for operations on lists of attributes.
+     *
+     * Contains operations that are common to tuple, key and id types.
+     */
     template<const char *...Attributes>
     class attribute_list :
         public detail::attribute_list_member<Attributes>...

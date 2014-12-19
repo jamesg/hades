@@ -13,6 +13,15 @@ namespace hades
 {
     namespace detail
     {
+        /*!
+         * \brief Annotate a tuple with a single boolean flag.
+         * \param Flag Relvar to use to store the flag.
+         *
+         * The boolean flag will be recorded as the presence or absence of a
+         * tuple with the same id as a the related tuple.  The flag will be
+         * stored in a relvar named 'Flag'.  The relvar should have been
+         * created with the same attributes as the tuple's candidate key.
+         */
         template<const char *Flag>
         struct has_flag :
             public has_attribute<Flag>,
@@ -48,6 +57,14 @@ namespace hades
             }
         };
     }
+    /*!
+     * \brief Annotate a tuple with a set of flags, each stored in its own
+     * relvar.
+     *
+     * \param Keys List of relvars that hold the flags.  Each relvar should
+     * have attributes matching the candidate key of the tuple type that the
+     * flags refer to.
+     */
     template<const char *...Keys>
     struct has_flags :
         public detail::has_flag<Keys>...,
