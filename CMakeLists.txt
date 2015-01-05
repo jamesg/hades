@@ -4,31 +4,10 @@ project(Hades)
 enable_testing()
 
 include_directories("include")
+include_directories("lib/jsmn/include")
 
-file(GLOB hades_sources src/*.cpp src/detail/*.cpp)
-file(GLOB hades_test_sources src/test/*.cpp)
-
-add_library(
-    hades
-    ${hades_sources}
-    )
-
-target_link_libraries(
-    hades
-    sqlite3
-    )
-
-add_executable(
-    hades-test
-    ${hades_test_sources}
-    )
-add_test(hades-test hades-test)
-
-target_link_libraries(
-    hades-test
-    hades
-    styx
-    )
+add_subdirectory(lib)
+add_subdirectory(src)
 
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
