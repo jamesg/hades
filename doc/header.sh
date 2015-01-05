@@ -4,5 +4,5 @@ cat << EOF
 <title>Hades SQLite ORM</title>
 </head>
 <body>
-<a href="index.html">Home</a>
+<a href="${WEB_BACKUP}index.html">Home</a>
 EOF

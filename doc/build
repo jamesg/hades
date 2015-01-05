@@ -1,14 +1,36 @@
 #!/bin/sh
-if [ ! -d md.static ]
-then
-    mkdir md.static
-fi
 
-ls md | grep '\.md$' | sed -s 's/\.md$//' | while read file
+lsr_() {
+    test -f "$1" && echo "$1"
+    test -d "$1" &&
+        ls $1 | ( while read file; do lsr_ $1/$file; done )
+}
+
+lsr() {
+    local base
+    test "$1" \= "" && base="." || base=$1
+    ( cd $base; lsr_ . | sed -e "s/^\.\///" )
+}
+
+lsr md | grep "\.md$" | sed -s "s/\.md$//" | while read file
 do
+    echo "* $file"
+    echo "md.static/$file" | xargs dirname | xargs mkdir -p
     (
+        export WEB_FILE=$file
+        export WEB_BACKUP=$( echo $WEB_FILE | sed -e "s/[^/]//g" -e "s/\//..\//g" )
         sh header.sh
         markdown md/$file.md
         sh footer.sh
     ) > md.static/$file.html
 done
+
+lsr md | grep "\.\(jpg\|png\)$" | sed -s "s/\.md$//" | while read file
+do
+    echo "& $file"
+    echo "md.static/$file" | xargs dirname | xargs mkdir -p
+    cp "md/$file" "md.static/$file"
+done
+
+exit 0
+

@@ -11,9 +11,9 @@ namespace, as per attribute names.
 Example
 -------
 
-    #include "hades/relation.hpp"
+        #include "hades/relation.hpp"
 
-    struct tuple_type :
-        hades::relation<db::relvar::relation_name>,
-        hades::tuple<db::attr::relation_name::attribute_name>
+        struct tuple_type :
+            hades::relation<db::relvar::relation_name>,
+            hades::tuple<db::attr::relation_name::attribute_name>
 

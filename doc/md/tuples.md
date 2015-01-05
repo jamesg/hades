@@ -1,13 +1,19 @@
 Tuple Types
 ===========
 
-An instantiation of hades::tuple is a model of a tuple in a relational database (a row in SQLite).
+A template instantiation of hades::tuple is a model of a tuple in a relational
+database (a row in SQLite).
 
-The tuple is the result of a query constructed from one or more base tables (relvars) or views.
+The tuple is the result of a query constructed from one or more base tables
+(relvars) or views.
 
-The tuple class is parameterised on a list of attribute names provided as const char \*.
+The tuple class is parameterised on a list of attribute names provided as const
+char \* (see section on [attributes](attributes.html)).
 
-hades::tuple has templated get&#95; functions.  These each accept the attribute name as a template argument and provide safe access to that attribute (attempting to access an attribute not in the tuple results in a compilation error).
+hades::tuple has templated get\_ functions.  These each accept the attribute
+name as a template argument and provide safe access to that attribute
+(attempting to access an attribute not in the tuple results in a compilation
+error).
 
 Example
 -------

@@ -10,8 +10,16 @@ Current Status
 Essential features are complete but additional features are under
 [development](development.html).
 
+Tutorial
+--------
+
+The quickest way to get started with Hades is to read the
+[basic tutorial](tutorial.html).
+
 Core Concepts
 -------------
+
+Read these sections in order for an in-depth tutorial to using Hades.
 
 * [Attributes](attributes.html)
 * [Tuples](tuples.html) (SQLite rows)
@@ -22,4 +30,8 @@ Core Concepts
 Additional Concepts
 -------------------
 * [Flags](flags.html)
+
+Complete Examples
+-----------------
+* [Photograph](examples/photograph.html)
 

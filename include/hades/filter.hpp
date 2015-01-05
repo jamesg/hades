@@ -162,6 +162,11 @@ namespace hades
     class order_by : public basic_filter
     {
         public:
+            /*!
+             * \brief Create an ORDER_BY filter with optional limit and offset.
+             *
+             * Either offset or both limit and offset may be omitted.
+             */
             order_by(const std::string& clause, const int limit=-1, const int offset=0) :
                 m_clause(clause),
                 m_limit(limit),

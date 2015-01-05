@@ -7,24 +7,24 @@ that they may be used as template arguments.  Strings should be stored as
 
 It is advisable to use a namespace convention for declaring attribute names.  For example, in a header file:
 
-    namespace application
-    {
-        namespace db
+        namespace application
         {
-            namespace attr
+            namespace db
             {
-                namespace relation_name
+                namespace attr
                 {
-                    extern const char attribute_name[];
+                    namespace relation_name
+                    {
+                        extern const char attribute_name[];
+                    }
                 }
             }
         }
-    }
 
 And in the implementation file:
 
-    const char application::db::attr::relation_name::attribute_name[] =
-        "attribute_name";
+        const char application::db::attr::relation_name::attribute_name[] =
+            "attribute_name";
 
 Later, relation names will be stored in the same way.
 

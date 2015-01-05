@@ -2,7 +2,6 @@
 
 #include "styx/object.hpp"
 
-#include "hades/attribute_list.hpp"
 #include "hades/custom_select.hpp"
 #include "hades/custom_select_one.hpp"
 #include "hades/devoid.hpp"
