@@ -43,3 +43,19 @@ SCENARIO("hades::tuple::to_row") {
     }
 }
 
+SCENARIO("hades::tuple assignment") {
+    GIVEN("a tuple") {
+        hades::tuple<t1_id, t2_id> tuple;
+        tuple.get_string<t1_id>() = "1";
+        tuple.get_string<t2_id>() = "2";
+
+        WHEN("the tuple is assigned") {
+            hades::tuple<t1_id, t2_id> tuple2 = tuple;
+            THEN("the attributes were copied") {
+                REQUIRE(tuple2.get_string<t1_id>() == "1");
+                REQUIRE(tuple2.get_string<t2_id>() == "2");
+            }
+        }
+    }
+}
+
