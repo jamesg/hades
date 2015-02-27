@@ -8,7 +8,7 @@ namespace
     constexpr char t2_id[] = "t2_id";
 }
 
-SCENARIO("db::compound_id") {
+SCENARIO("hades::compound_id") {
     GIVEN("a compound id with two keys") {
         hades::compound_id<t1_id, t2_id> id;
 
