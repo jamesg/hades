@@ -5,6 +5,7 @@ enable_testing()
 
 include_directories("include")
 include_directories("lib/jsmn/include")
+include_directories("lib/sqlite3/include")
 
 add_subdirectory(lib)
 add_subdirectory(src)
