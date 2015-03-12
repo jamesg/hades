@@ -59,6 +59,15 @@ namespace hades
         public virtual styx::object
     {
         public:
+            // Inherit 'unsafe' accessors from styx::object.
+            using styx::object::get_double;
+            using styx::object::get_int;
+            using styx::object::get_list;
+            using styx::object::get_string;
+            using styx::object::get_object;
+            using styx::object::get_element;
+            using styx::object::get_bool;
+
             static constexpr const size_t arity = sizeof...(Attributes);
             tuple()
             {
