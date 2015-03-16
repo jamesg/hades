@@ -2,7 +2,7 @@
 
 #include "hades/exception.hpp"
 
-void hades::devoid(const std::string& query, connection& db)
+int hades::devoid(const std::string& query, connection& db)
 {
     sqlite3_stmt *stmt = nullptr;
     sqlite3_prepare(db.handle(), query.c_str(), -1, &stmt, nullptr);
@@ -23,5 +23,6 @@ void hades::devoid(const std::string& query, connection& db)
             mkstr() << "finalising devoid SQL query \"" << query <<
                 "\": " << sqlite3_errmsg(db.handle())
             );
+    return sqlite3_changes(db.handle());
 }
 

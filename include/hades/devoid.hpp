@@ -19,9 +19,14 @@ namespace hades
      * \brief Execute a query that is not expected to return a result (or
      * returns a result that we are not interested in).
      *
+     * \returns The number of rows affected by the query, if the query is an
+     * INSERT, DELETE or UPDATE.  For any other type of query, the result is
+     * undefined.  The result is also undefined if multiple threads are
+     * accessing the database.
+     *
      * \throws hades::exception when an SQL error is encountered.
      */
-    void devoid(const std::string& query, connection& db);
+    int devoid(const std::string& query, connection& db);
     /*!
      * \brief Execute a query that is not expected to return a result (or
      * returns a result that we are not interested in).
@@ -30,10 +35,15 @@ namespace hades
      * mark placeholders in the SQL statement.  A useful container is
      * hades::row.
      *
+     * \returns The number of rows affected by the query, if the query is an
+     * INSERT, DELETE or UPDATE.  For any other type of query, the result is
+     * undefined.  The result is also undefined if multiple threads are
+     * accessing the database.
+     *
      * \throws hades::exception when an SQL error is encountered.
      */
     template <typename T>
-    void devoid(const std::string& query, const T& values, connection& db)
+    int devoid(const std::string& query, const T& values, connection& db)
     {
         sqlite3_stmt *stmt = nullptr;
         sqlite3_prepare(db.handle(), query.c_str(), -1, &stmt, nullptr);
@@ -50,6 +60,7 @@ namespace hades
                 mkstr() << "finalising devoid SQL query \"" << query <<
                     "\": " << sqlite3_errmsg(db.handle())
                 );
+        return sqlite3_changes(db.handle());
     }
 }
 
