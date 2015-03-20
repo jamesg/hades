@@ -42,7 +42,7 @@ void hades::bind_any(int index, const styx::element& element, sqlite3_stmt *stmt
 
         void operator()(const styx::list& o) const
         {
-            throw hades::exception("binding object to SQL statement");
+            throw hades::exception("binding list to SQL statement");
         }
 
         void operator()(const styx::object& o) const
