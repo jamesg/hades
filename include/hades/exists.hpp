@@ -19,7 +19,7 @@ namespace hades
      * \throws std::exception
      */
     template<typename Tuple>
-    bool exists(connection& conn, basic_filter& filter)
+    bool exists(connection& conn, const basic_filter& filter)
     {
         std::ostringstream query;
         query << "SELECT ";

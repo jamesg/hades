@@ -206,15 +206,17 @@ namespace hades
         template<int Index, const char *Attr>
         static void retrieve_values_(sqlite3_stmt *stmt, styx::object& out)
         {
-            const char *value = hades::get_column_text(stmt, Index);
+            std::string s;
+            hades::get_column(stmt, Index, s);
+            //const char *value = hades::get_column_text(stmt, Index);
 #ifdef HADES_ENABLE_DEBUGGING
             std::cerr <<
                 "hades::attribute_list::retrieve_values: retrieving " <<
                 Index << " " << Attr << " value: " << (value?value:"null") <<
                 std::endl;
 #endif
-            if(value)
-                out.get_string(Attr) = value;
+            //if(value)
+                out.get_string(Attr) = s/*value*/;
         }
 
         template<int Index>

@@ -64,7 +64,7 @@ void hades::bind_any(int index, const styx::element& element, sqlite3_stmt *stmt
 
 void hades::bind(int index, const std::string& s, sqlite3_stmt *stmt)
 {
-    if(sqlite3_bind_text(stmt, index, s.c_str(), s.length(), nullptr) != SQLITE_OK)
+    if(sqlite3_bind_blob(stmt, index, s.c_str(), s.length(), nullptr) != SQLITE_OK)
         throw hades::exception(
             mkstr() << "binding string \"" << s << "\" to index " << index
             );

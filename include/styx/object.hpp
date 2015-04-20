@@ -32,6 +32,11 @@ namespace styx
             return (m_map.find(key) != m_map.cend());
         }
 
+        std::map<std::string, element>::size_type erase(const std::string& key)
+        {
+            return m_map.erase(key);
+        }
+
         // Variant accessor functions - may throw a boost::bad_get exception.
 
         // Generic 'get' function.

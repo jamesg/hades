@@ -14,11 +14,14 @@ void hades::get_column(sqlite3_stmt *stmt, const int index, int& out)
 
 void hades::get_column(sqlite3_stmt *stmt, const int index, std::string& out)
 {
+    int n_bytes = sqlite3_column_bytes(stmt, index);
     const char *sql_val = reinterpret_cast<const char*>(
-            sqlite3_column_text(stmt, index)
+            sqlite3_column_blob(stmt, index)
             );
-    if(sql_val == nullptr) out = "";
-    else out = std::string(sql_val);
+    if(sql_val == nullptr)
+        out = "";
+    else
+        out = std::string(sql_val, n_bytes);
 }
 
 const char *hades::get_column_text(sqlite3_stmt *stmt, const int index)
