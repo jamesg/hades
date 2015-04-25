@@ -208,15 +208,12 @@ namespace hades
         {
             std::string s;
             hades::get_column(stmt, Index, s);
-            //const char *value = hades::get_column_text(stmt, Index);
 #ifdef HADES_ENABLE_DEBUGGING
-            std::cerr <<
+            std::jerr <<
                 "hades::attribute_list::retrieve_values: retrieving " <<
-                Index << " " << Attr << " value: " << (value?value:"null") <<
-                std::endl;
+                Index << " " << Attr << " value: " << s << std::endl;
 #endif
-            //if(value)
-                out.get_string(Attr) = s/*value*/;
+            out.get_string(Attr) = s;
         }
 
         template<int Index>

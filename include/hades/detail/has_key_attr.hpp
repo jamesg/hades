@@ -25,18 +25,8 @@ namespace hades
          * a type to form a candidate key.
          */
         template<const char *Attribute>
-        class has_key_attr :
-            public virtual styx::object
+        class has_key_attr
         {
-            public:
-                has_key_attr()
-                {
-                }
-
-                explicit has_key_attr(const styx::element& o) :
-                    styx::object(o)
-                {
-                }
         };
     }
 }

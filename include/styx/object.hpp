@@ -75,11 +75,6 @@ namespace styx
             return get<bool&>(k);
         }
 
-        //void insert(const std::pair<std::string, styx::element>& p)
-        //{
-            //m_map.insert(p);
-        //}
-
         friend std::string serialise_json(const element&);
 
         std::map<std::string, element> m_map;

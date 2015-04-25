@@ -54,6 +54,9 @@ namespace hades
                         query.str() << "\""
                     );
         }
+#ifdef HADES_ENABLE_DEBUGGING
+        std::cerr << "hades::get_one bind filter" << std::endl;
+#endif
         filter.bind(stmt);
 
         if(sqlite3_step(stmt) == SQLITE_ROW)
@@ -61,12 +64,18 @@ namespace hades
             try
             {
                 Tuple out;
+#ifdef HADES_ENABLE_DEBUGGING
+                std::cerr << "hades::get_one retrieve" << std::endl;
+#endif
                 Tuple::attribute_list_type::retrieve_values(stmt, out);
                 sqlite3_finalize(stmt);
                 return out;
             }
-            catch(const std::exception&)
+            catch(const std::exception& e)
             {
+#ifdef HADES_ENABLE_DEBUGGING
+                std::cerr << "hades::get_one exception " << e.what() << std::endl;
+#endif
                 sqlite3_finalize(stmt);
                 throw;
             }

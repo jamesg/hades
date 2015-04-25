@@ -50,6 +50,30 @@ namespace hades
 
             static constexpr const char *first_key_attr = first<Attributes...>::value;
 
+            /*
+             * Override the move constructors and assignment operators.
+             *
+             * Doing this will stop the operators in styx::object being called
+             * twice when a tuple class inherits from virtual styx::object via
+             * hades::has_candidate_key and hades::tuple.
+             */
+
+            has_candidate_key<Attributes...>()
+            {
+            }
+
+            has_candidate_key<Attributes...>(const has_candidate_key<Attributes...>&)
+            {
+            }
+
+            has_candidate_key<Attributes...>(has_candidate_key<Attributes...>&&)
+            {
+            }
+
+            has_candidate_key<Attributes...>& operator=(has_candidate_key<Attributes...>&&)
+            {
+            }
+
             /*!
              * \brief Get the value of an attribute within the candidate
              * key.

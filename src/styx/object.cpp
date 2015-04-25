@@ -4,9 +4,11 @@
 #include "styx/cast.hpp"
 #include "styx/get_default.hpp"
 
+#include <iostream>
+
 styx::object::object(const element& o)
 {
-    object *m = boost::get<object>(&const_cast<element&>(o));
+    const object *m = boost::get<const object>(&o);
     if(m)
         m_map = m->m_map;
 }

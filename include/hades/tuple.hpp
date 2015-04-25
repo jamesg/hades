@@ -55,7 +55,7 @@ namespace hades
      */
     template<const char *...Attributes>
     class tuple :
-        private detail::has_attribute<Attributes>...,
+        private virtual detail::has_attribute<Attributes>...,
         public virtual styx::object
     {
         public:
@@ -73,6 +73,10 @@ namespace hades
             {
             }
             tuple(const styx::element& e) :
+                styx::object(e)
+            {
+            }
+            tuple(styx::element&& e) :
                 styx::object(e)
             {
             }
@@ -158,6 +162,29 @@ namespace hades
             {
                 return get_attr<Attr, std::string>();
             }
+
+            template<const char *Attr>
+            bool copy_bool() const
+            {
+                return copy_attr<Attr, bool>();
+            }
+            template<const char *Attr>
+            double copy_double() const
+            {
+                return copy_attr<Attr, double>();
+            }
+            template<const char *Attr>
+            int copy_int() const
+            {
+                return copy_attr<Attr, int>();
+            }
+            template<const char *Attr>
+            std::string copy_string() const
+            {
+                return copy_attr<Attr, std::string>();
+            }
+
+
             //template<const char *Attr>
             //bool has_key()
             //{

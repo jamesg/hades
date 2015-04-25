@@ -1,6 +1,10 @@
 #ifndef HADES_BIND_VALUES_HPP
 #define HADES_BIND_VALUES_HPP
 
+#ifdef HADES_ENABLE_DEBUGGING
+#include <iostream>
+#endif
+
 #include <algorithm>
 #include <stdexcept>
 
@@ -52,6 +56,10 @@ namespace hades
                 template<typename T>
                 int operator()(const int index, const T& val) const
                 {
+#ifdef HADES_ENABLE_DEBUGGING
+                    std::cerr << "hades::detail::bind_fusion bind " << val <<
+                        " to " << index << std::endl;
+#endif
                     bind(index, val, m_stmt);
                     return index + 1;
                 }
