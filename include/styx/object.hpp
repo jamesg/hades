@@ -15,12 +15,29 @@ namespace styx
      */
     struct object
     {
+        typedef std::map<std::string, element> map_type;
+        typedef map_type::size_type size_type;
+        typedef map_type::iterator iterator;
+        typedef map_type::const_iterator const_iterator;
+        typedef map_type::reverse_iterator reverse_iterator;
+        typedef map_type::const_reverse_iterator const_reverse_iterator;
+
         object()
         {
         }
         /*!
          */
         object(const element& o);
+
+        // Iterators.
+        iterator begin() { return m_map.begin(); }
+        iterator end() { return m_map.end(); }
+        const_iterator cbegin() const { return m_map.cbegin(); }
+        const_iterator cend() const { return m_map.cend(); }
+        reverse_iterator rbegin() { return m_map.rbegin(); }
+        reverse_iterator rend() { return m_map.rend(); }
+        const_reverse_iterator crbegin() const { return m_map.crbegin(); }
+        const_reverse_iterator crend() const { return m_map.crend(); }
 
         element& operator[](const std::string &k)
         {
@@ -77,7 +94,7 @@ namespace styx
 
         friend std::string serialise_json(const element&);
 
-        std::map<std::string, element> m_map;
+        map_type m_map;
     };
 
     template<>
