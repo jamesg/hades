@@ -70,8 +70,14 @@ namespace hades
             {
             }
 
+            has_candidate_key<Attributes...>& operator=(const has_candidate_key<Attributes...>&)
+            {
+                return *this;
+            }
+
             has_candidate_key<Attributes...>& operator=(has_candidate_key<Attributes...>&&)
             {
+                return *this;
             }
 
             /*!

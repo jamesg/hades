@@ -38,7 +38,7 @@ namespace hades
          *
          * \note Does not obtain additional flags.
          */
-        static styx::list get_collection(connection&, basic_filter&);
+        static styx::list get_collection(connection&, const basic_filter&);
 
         /*!
          * \brief Retrieve all non-id fields of this tuple based on the id.

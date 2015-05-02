@@ -27,6 +27,25 @@ namespace hades
             public has_attribute<Flag>,
             virtual styx::object
         {
+            /*!
+             * \note Do not call the styx::object constructor.
+             */
+            has_flag<Flag>()
+            {
+            }
+
+            has_flag<Flag>(const has_flag<Flag>&)
+            {
+            }
+
+            has_flag<Flag>(has_flag<Flag>&&)
+            {
+            }
+
+            has_flag<Flag>& operator=(has_flag<Flag>&&)
+            {
+            }
+
             template<typename Tuple>
             void save_flag(Tuple& t, connection& conn)
             {
@@ -71,6 +90,31 @@ namespace hades
         public detail::basic_has_flags,
         virtual styx::object
     {
+        /*!
+         * \note Do not call the styx::object constructor.
+         */
+        has_flags<Keys...>()
+        {
+        }
+
+        has_flags<Keys...>(const has_flags<Keys...>&)
+        {
+        }
+
+        has_flags<Keys...>(has_flags<Keys...>&&)
+        {
+        }
+
+        has_flags<Keys...>& operator=(const has_flags<Keys...>&)
+        {
+                return *this;
+        }
+
+        has_flags<Keys...>& operator=(has_flags<Keys...>&&)
+        {
+                return *this;
+        }
+
         template<typename Tuple>
         void get_flags(connection& conn, Tuple& t)
         {

@@ -209,7 +209,7 @@ namespace hades
             std::string s;
             hades::get_column(stmt, Index, s);
 #ifdef HADES_ENABLE_DEBUGGING
-            std::jerr <<
+            std::cerr <<
                 "hades::attribute_list::retrieve_values: retrieving " <<
                 Index << " " << Attr << " value: " << s << std::endl;
 #endif
