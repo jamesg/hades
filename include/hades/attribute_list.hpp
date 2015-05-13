@@ -237,6 +237,9 @@ namespace hades
                 styx::object& to
                 )
         {
+#ifdef HADES_ENABLE_DEBUGGING
+            std::cerr << "hades::attribute_list::copy_attributes_ attr: " << Attr << std::endl;//" from: " from.get_element(Attr) << " to: " << to.get_element(Attr) << std::endl;
+#endif
             to.get_element(Attr) = from.get_element(Attr);
         }
 

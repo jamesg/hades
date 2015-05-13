@@ -59,6 +59,36 @@ namespace hades
         public virtual styx::object
     {
         public:
+            /*
+             * Override the move constructors and assignment operators.
+             *
+             * Doing this will stop the operators in styx::object being called
+             * twice when a tuple class inherits from virtual styx::object via
+             * hades::has_candidate_key and hades::tuple.
+             */
+
+            tuple<Attributes...>()
+            {
+            }
+
+            tuple<Attributes...>(const tuple<Attributes...>&)
+            {
+            }
+
+            tuple<Attributes...>(tuple<Attributes...>&&)
+            {
+            }
+
+            tuple<Attributes...>& operator=(const tuple<Attributes...>&)
+            {
+                return *this;
+            }
+
+            tuple<Attributes...>& operator=(tuple<Attributes...>&&)
+            {
+                return *this;
+            }
+
             // Inherit 'unsafe' accessors from styx::object.
             using styx::object::get_double;
             using styx::object::get_int;
@@ -69,17 +99,6 @@ namespace hades
             using styx::object::get_bool;
 
             static constexpr const size_t arity = sizeof...(Attributes);
-            tuple()
-            {
-            }
-            tuple(const styx::element& e) :
-                styx::object(e)
-            {
-            }
-            tuple(styx::element&& e) :
-                styx::object(e)
-            {
-            }
             hades::string_row<arity> to_string_row() const
             {
                 hades::string_row<arity> out;

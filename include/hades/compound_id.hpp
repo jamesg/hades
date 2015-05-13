@@ -1,11 +1,17 @@
 #ifndef HADES_COMPOUND_ID_HPP
 #define HADES_COMPOUND_ID_HPP
 
+#ifdef HADES_ENABLE_DEBUGGING
+#include <iostream>
+#endif
 #include <utility>
 
 #include "styx/element.hpp"
 #include "styx/styx.hpp"
 #include "styx/object.hpp"
+#ifdef HADES_ENABLE_DEBUGGING
+#include "styx/serialise_json.hpp"
+#endif
 
 #include "hades/attribute_list.hpp"
 #include "hades/detail/has_key_attr.hpp"
@@ -76,21 +82,20 @@ namespace hades
     public:
         typedef has_candidate_key<Keys...> candidate_key_type;
 
-        template<int Start=0>
-        static compound_id<Keys...> from_stmt(sqlite3_stmt *stmt)
-        {
-            compound_id<Keys...> id;
-            // 0 is the first index when retrieving values.
-            attribute_list<Keys...>::template retrieve_values<Start>(
-                    stmt,
-                    id
-                    );
-            return id;
-        }
-
         compound_id()
         {
         }
+
+        compound_id(const compound_id<Keys...>& o) :
+            styx::object(o)
+        {
+        }
+
+        compound_id(compound_id<Keys...>&& o) :
+            styx::object(o)
+        {
+        }
+
         compound_id(std::initializer_list<int> values)
         {
             detail::copy_id_list<compound_id<Keys...>, Keys...>(
@@ -103,9 +108,32 @@ namespace hades
             styx::object(e)
         {
         }
-        compound_id(const compound_id& m) :
-            styx::object(m)
+
+        compound_id<Keys...>& operator=(const compound_id<Keys...>& o)
         {
+            static_cast<styx::object&>(*this) = o;
+            return *this;
+        }
+
+        compound_id<Keys...>& operator=(compound_id<Keys...>&& o)
+        {
+            static_cast<styx::object&>(*this) = o;
+            return *this;
+        }
+
+        template<int Start=0>
+        static compound_id<Keys...> from_stmt(sqlite3_stmt *stmt)
+        {
+            compound_id<Keys...> id;
+            // 0 is the first index when retrieving values.
+            attribute_list<Keys...>::template retrieve_values<Start>(
+                    stmt,
+                    id
+                    );
+#ifdef HADES_ENABLE_DEBUGGING
+            std::cerr << "hades::compound_id::from_stmt id " << styx::serialise_json(id) << std::endl;
+#endif
+            return id;
         }
 
         /*!

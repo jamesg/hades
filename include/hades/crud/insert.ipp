@@ -15,6 +15,9 @@
 #include "hades/detail/last_insert_rowid.hpp"
 #include "hades/mkstr.hpp"
 #include "styx/serialisers/vector.hpp"
+#ifdef HADES_ENABLE_DEBUGGING
+#include "styx/serialise_json.hpp"
+#endif
 
 namespace hades
 {
@@ -154,6 +157,10 @@ void hades::crud<Tuple>::insert(connection& conn)
         typename Tuple::id_type id =
             Tuple::id_type::from_stmt(last_id_stmt);
         t.set_id(id);
+#ifdef HADES_ENABLE_DEBUGGING
+        std::cerr << "hades::crud::insert id " << styx::serialise_json(id) << std::endl;
+        std::cerr << "hades::crud::insert new tuple " << styx::serialise_json(t) << std::endl;
+#endif
 
         int finalise_ret = sqlite3_finalize(last_id_stmt);
         if(finalise_ret != SQLITE_OK && finalise_ret != SQLITE_DONE)

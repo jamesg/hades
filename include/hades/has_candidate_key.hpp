@@ -1,9 +1,15 @@
 #ifndef HADES_HAS_CANDIDATE_KEY_HPP
 #define HADES_HAS_CANDIDATE_KEY_HPP
 
+#ifdef HADES_ENABLE_DEBUGGING
+#include <iostream>
+#endif
 #include <type_traits>
 
 #include "styx/object.hpp"
+#ifdef HADES_ENABLE_DEBUGGING
+#include "styx/serialise_json.hpp"
+#endif
 
 #include "hades/compound_id.hpp"
 #include "hades/detail/has_key_attr.hpp"
