@@ -79,13 +79,15 @@ namespace hades
             {
             }
 
-            tuple<Attributes...>& operator=(const tuple<Attributes...>&)
+            tuple<Attributes...>& operator=(const tuple<Attributes...>& o)
             {
+                static_cast<styx::object&>(*this) = o;
                 return *this;
             }
 
-            tuple<Attributes...>& operator=(tuple<Attributes...>&&)
+            tuple<Attributes...>& operator=(tuple<Attributes...>&& o)
             {
+                static_cast<styx::object&>(*this) = o;
                 return *this;
             }
 
