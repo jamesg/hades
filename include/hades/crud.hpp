@@ -32,6 +32,39 @@ namespace hades
          * \note Does not obtain additional flags.
          */
         static styx::list get_collection(connection&);
+
+        /*!
+         * \brief Update the collection with objects in a styx::list.
+         *
+         * \note Does not delete items in the collection that are not in the
+         * input list.  If this behaviour is desired, use
+         * hades::crud::overwrite_collection instead.
+         *
+         * \note The tuple type to save must have a styx::element constructor.
+         */
+        static void save_collection(const styx::list&, connection&);
+
+        /*!
+         * \brief Overwrite a collection with the objects in a styx::list.
+         *
+         * \note Any items in the collection that are not contained in the
+         * input list will be deleted.  If the items should be left as they
+         * are, use hades::crud::save_collection instead.
+         *
+         * \note The tuple type to save must have a styx::element constructor.
+         */
+        static void overwrite_collection(const styx::list&, connection&);
+
+        /*!
+         * \brief Destroy the entire collection.
+         */
+        static void destroy_collection(connection&);
+
+        /*!
+         * \brief Destroy all matching tuples in the collection.
+         */
+        static void destroy_collection(const basic_filter&, connection&);
+
         /*!
          * \brief Get all tuples of this type from the database matching a
          * filter.

@@ -38,10 +38,14 @@ namespace styx
         // Iterators.
         iterator begin() { return elements.begin(); }
         iterator end() { return elements.end(); }
+        const_iterator begin() const { return elements.begin(); }
+        const_iterator end() const { return elements.end(); }
         const_iterator cbegin() const { return elements.cbegin(); }
         const_iterator cend() const { return elements.cend(); }
         reverse_iterator rbegin() { return elements.rbegin(); }
         reverse_iterator rend() { return elements.rend(); }
+        const_reverse_iterator rbegin() const { return elements.rbegin(); }
+        const_reverse_iterator rend() const { return elements.rend(); }
         const_reverse_iterator crbegin() const { return elements.crbegin(); }
         const_reverse_iterator crend() const { return elements.crend(); }
 
