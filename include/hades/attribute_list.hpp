@@ -206,6 +206,8 @@ namespace hades
         template<int Index, const char *Attr>
         static void retrieve_values_(sqlite3_stmt *stmt, styx::object& out)
         {
+            if(sqlite3_column_type(stmt, Index) == SQLITE_NULL)
+                return;
             std::string s;
             hades::get_column(stmt, Index, s);
 #ifdef HADES_ENABLE_DEBUGGING
