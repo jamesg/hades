@@ -20,5 +20,22 @@ void hades::crud<Tuple>::overwrite_collection(
     transaction.commit();
 }
 
+template<typename Tuple>
+void hades::crud<Tuple>::overwrite_collection(
+        const styx::list& list,
+        const basic_filter& filter,
+        connection& conn
+        )
+{
+    hades::transaction transaction(conn, "hades_crud_overwrite_collection");
+    Tuple::destroy_collection(filter, conn);
+    for(const styx::element& e : list)
+    {
+        Tuple t(e);
+        t.insert(conn);
+    }
+    transaction.commit();
+}
+
 #endif
 

@@ -56,6 +56,24 @@ namespace hades
         static void overwrite_collection(const styx::list&, connection&);
 
         /*!
+         * \brief Overwrite a collection with the objects in a styx::list.
+         *
+         * \param filter Limits the tuples within the collection that will be
+         * deleted.
+         *
+         * \note Any items in the collection that are not contained in the
+         * input list will be deleted.  If the items should be left as they
+         * are, use hades::crud::save_collection instead.
+         *
+         * \note The tuple type to save must have a styx::element constructor.
+         */
+        static void overwrite_collection(
+                const styx::list&,
+                const hades::basic_filter& filter,
+                connection&
+                );
+
+        /*!
          * \brief Destroy the entire collection.
          */
         static void destroy_collection(connection&);
