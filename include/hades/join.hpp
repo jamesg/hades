@@ -134,7 +134,7 @@ namespace hades
         // attribute_list::retrieve_values).
         //
 
-        template<int Start, typename Flag>
+        template<int Start, bool SkipKeys, typename Flag>
         typename std::enable_if<std::is_base_of<detail::basic_flag, Flag>::value>::type
         retrieve_tuple_values(
                 sqlite3_stmt *stmt,
@@ -151,7 +151,7 @@ namespace hades
             accessor.get_bool(Flag::relation_name) = (out > 0);
         }
 
-        template<int Start, typename Tuple>
+        template<int Start, bool SkipKeys, typename Tuple>
         typename std::enable_if<!std::is_base_of<detail::basic_flag, Tuple>::value>::type
         retrieve_tuple_values(
                 sqlite3_stmt *stmt,
@@ -200,7 +200,7 @@ namespace hades
         // (a set of relations).
         //
 
-        template<typename ...Relations>
+        template<bool SkipKeys, typename ...Relations>
         struct join_values
         {
             static void retrieve_join_values(
@@ -217,7 +217,8 @@ namespace hades
                     styx::object& accessor
                     )
             {
-                retrieve_tuple_values<Start, Rel>(stmt, accessor);
+                // Skip retrieving keys for all but the first tuple.
+                retrieve_tuple_values<Start, SkipKeys && (Start != 0), Rel>(stmt, accessor);
             }
 
             template<int Start, typename Rel1, typename Rel2, typename ...Rels>
@@ -259,7 +260,7 @@ namespace hades
 
     namespace detail
     {
-        template<typename ...Tuples>
+        template<bool SkipKeys, typename ...Tuples>
         styx::list fetch_join_result(sqlite3_stmt *stmt)
         {
             styx::list list;
@@ -269,7 +270,7 @@ namespace hades
                 try
                 {
                     styx::object object;
-                    detail::join_values<Tuples...>::retrieve_join_values(
+                    detail::join_values<SkipKeys, Tuples...>::retrieve_join_values(
                             stmt,
                             object
                             );
@@ -299,7 +300,7 @@ namespace hades
      * \param filter SQL filter clause to use for the query.  Question mark
      * placeholders are filled with values in 'values'.
      */
-    template<const char *Join, typename ...Tuples>
+    template<const char *Join, bool SkipKeys, typename ...Tuples>
     styx::list join_on_(
             connection& conn,
             const std::string& on,
@@ -336,7 +337,7 @@ namespace hades
                     );
         }
         filter_.bind(stmt);
-        styx::list out = detail::fetch_join_result<Tuples...>(stmt);
+        styx::list out = detail::fetch_join_result<SkipKeys, Tuples...>(stmt);
         if(sqlite3_finalize(stmt) != SQLITE_OK)
             throw hades::exception("finalizing SQLite statement");
         return out;
@@ -354,7 +355,7 @@ namespace hades
      * \param filter SQL filter clause to use for the query.  Question mark
      * placeholders are filled with values in 'values'.
      */
-    template<const char *Join, bool EquiJoin, typename ...Tuples>
+    template<const char *Join, bool SkipKeys, bool EquiJoin, typename ...Tuples>
     styx::list join_(
             connection& conn,
             const basic_filter& filter_
@@ -391,7 +392,7 @@ namespace hades
                     );
         }
         filter_.bind(stmt);
-        styx::list out = detail::fetch_join_result<Tuples...>(stmt);
+        styx::list out = detail::fetch_join_result<SkipKeys, Tuples...>(stmt);
         if(sqlite3_finalize(stmt) != SQLITE_OK)
             throw hades::exception("finalizing SQLite statement");
         return out;
@@ -428,7 +429,7 @@ namespace hades
             const basic_filter& filter_
             )
     {
-        return join_<detail::join_type::inner, false, Tuple...>(
+        return join_<detail::join_type::inner, false, false, Tuple...>(
                 conn,
                 filter_
                 );
@@ -445,7 +446,7 @@ namespace hades
     template<typename ...Tuples>
     styx::list equi_join(connection& conn)
     {
-        return join_<detail::join_type::inner, true, Tuples...>(
+        return join_<detail::join_type::inner, true, true, Tuples...>(
                 conn,
                 filter_all()
                 );
@@ -465,7 +466,7 @@ namespace hades
             const basic_filter& filter_
             )
     {
-        return join_<detail::join_type::inner, true, Tuples...>(
+        return join_<detail::join_type::inner, true, true, Tuples...>(
                 conn,
                 filter_
                 );
@@ -482,7 +483,7 @@ namespace hades
     template<typename ...Tuples>
     styx::list equi_outer_join(connection& conn)
     {
-        return join_<detail::join_type::outer, true, Tuples...>(
+        return join_<detail::join_type::outer, true, true, Tuples...>(
                 conn,
                 filter_all()
                 );
@@ -502,7 +503,7 @@ namespace hades
             const basic_filter& filter_
             )
     {
-        return join_<detail::join_type::outer, true, Tuples...>(
+        return join_<detail::join_type::outer, true, true, Tuples...>(
                 conn,
                 filter_
                 );
@@ -519,7 +520,7 @@ namespace hades
     template<typename ...Tuples>
     styx::list outer_join(connection& conn)
     {
-        return join_<detail::join_type::outer, false, Tuples...>(
+        return join_<detail::join_type::outer, false, false, Tuples...>(
                 conn,
                 filter_all()
                 );
@@ -539,7 +540,7 @@ namespace hades
             const basic_filter& filter_
             )
     {
-        return join_<detail::join_type::outer, false, Tuples...>(
+        return join_<detail::join_type::outer, false, false, Tuples...>(
                 conn,
                 filter_
                 );
@@ -556,7 +557,7 @@ namespace hades
     template<typename ...Tuples>
     styx::list outer_join(connection& conn, const std::string& on)
     {
-        return join_on_<detail::join_type::outer, Tuples...>(
+        return join_on_<detail::join_type::outer, false, Tuples...>(
                 conn,
                 on,
                 filter_all()
@@ -578,7 +579,7 @@ namespace hades
             const basic_filter& filter_
             )
     {
-        return join_on_<detail::join_type::outer, Tuples...>(
+        return join_on_<detail::join_type::outer, false, Tuples...>(
                 conn,
                 on,
                 filter_

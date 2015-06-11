@@ -4,6 +4,7 @@ project(Hades)
 enable_testing()
 
 include_directories("include")
+include_directories("lib/catch/include")
 include_directories("lib/jsmn/include")
 include_directories("lib/sqlite3/include")
 
