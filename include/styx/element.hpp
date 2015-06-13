@@ -10,7 +10,6 @@ namespace styx
     class list;
     class object;
 
-    typedef boost::recursive_wrapper<std::string> r_string;
     typedef boost::recursive_wrapper<object> r_object;
     typedef boost::recursive_wrapper<list> r_list;
 
