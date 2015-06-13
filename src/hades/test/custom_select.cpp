@@ -28,6 +28,9 @@ namespace
         public hades::tuple<attribute::site_id, attribute::name>,
         public hades::has_candidate_key<attribute::site_id>
     {
+        site()
+        {
+        }
         site(styx::element& o) :
             styx::object(o)
         {
@@ -66,7 +69,7 @@ SCENARIO("db::custom_select") {
                     );
 
             THEN("custom_select_one returns the tuple") {
-                styx::element element = hades::custom_select_one<
+                site element = hades::custom_select_one<
                     site,
                     hades::row<std::string>,
                     attribute::name>(
@@ -74,7 +77,7 @@ SCENARIO("db::custom_select") {
                         "SELECT name FROM site WHERE name = ?",
                         hades::row<std::string>("custom_name")
                         );
-                REQUIRE(site(element).name() == "custom_name");
+                REQUIRE(element.name() == "custom_name");
             }
         }
     }

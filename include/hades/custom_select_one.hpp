@@ -9,27 +9,49 @@ namespace hades
 {
     /*!
      * \brief Execute a custom SELECT statement that is expected to return
-     * exactly one tuple.  An exception is thrown if xero or more than one
+     * exactly one tuple.  An exception is thrown if zero or more than one
      * tuples are returned.
      */
     template<typename Tuple, typename Values, const char *...Attributes>
-    styx::element custom_select_one(
+    Tuple custom_select_one(
             hades::connection& conn,
             const std::string& query,
             const Values& values
             )
     {
-        styx::list out = custom_select<Tuple, Values, Attributes...>(
-                conn,
-                query,
-                values
+        sqlite3_stmt *stmt = nullptr;
+        if( sqlite3_prepare(
+                    conn.handle(),
+                    query.c_str(),
+                    -1,
+                    &stmt,
+                    nullptr
+                    ) != SQLITE_OK )
+        {
+            throw hades::exception(
+                mkstr() << "preparing SQLite statement for custom_select \"" <<
+                    query << "\": " << sqlite3_errmsg(conn.handle())
                 );
-        if(out.size() == 0)
-            throw std::runtime_error("no row in custom_select_one");
-        else if(out.size() > 1)
-            throw std::runtime_error("more than one row in custom_select_one");
+        }
+
+        bind_values(values, stmt);
+
+        Tuple out;
+        if(sqlite3_step(stmt) == SQLITE_ROW)
+            attribute_list<Attributes...>::retrieve_values(stmt, out);
         else
-            return out[0];
+            throw hades::exception(
+                mkstr() <<
+                "hades::custom_select_one zero rows in result of \"" << query <<
+                "\""
+                );
+        if(sqlite3_step(stmt) == SQLITE_ROW)
+            throw hades::exception(
+                mkstr() <<
+                "hades::custom_select_one more than one row in result of \"" <<
+                query << "\""
+                );
+        return out;
     }
 }
 
