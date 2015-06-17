@@ -43,6 +43,46 @@ namespace hades
         }
 
         //
+        // equijoin_relation_list: write a list of relations and join conditions to a stream.
+        //
+
+        template<const char *Join, typename RelationBase>
+        void equijoin_relation_list_(std::ostream&)
+        {
+            // Do nothing; the name of RelationBase will already have been
+            // appended.
+        }
+
+        template<const char *Join, typename RelationBase, typename RelationLast>
+        void equijoin_relation_list_(std::ostream& os)
+        {
+            os << Join << " " << RelationLast::relation_name << " ON ";
+            RelationBase::attribute_list_type::template equijoin_on_clause<
+                (const char*)RelationBase::relation_name,
+                (const char*)RelationLast::relation_name>(os);
+        }
+
+        template<
+                const char *Join,
+                typename RelationBase,
+                typename Relation1,
+                typename Relation2,
+                typename ...Relations>
+        void equijoin_relation_list_(std::ostream& os)
+        {
+            equijoin_relation_list_<Join, RelationBase, Relation1>(os);
+            os << " ";
+            equijoin_relation_list_<Join, RelationBase, Relation2, Relations...>(os);
+        }
+
+        template<const char *Join, typename RelationBase, typename ...Relations>
+        void equijoin_relation_list(std::ostream& os)
+        {
+            os << RelationBase::relation_name;
+            equijoin_relation_list_<Join, RelationBase, Relations...>(os);
+        }
+
+        //
         // on_clause: generate the 'ON t1.id = t2.id'... part of the query.
         //
 
@@ -365,9 +405,12 @@ namespace hades
         query << "SELECT ";
         detail::all_column_list<Tuples...>(query);
         query << " FROM ";
-        detail::relation_list<Join, Tuples...>(query);
-        if(sizeof...(Tuples) > 1)
-            detail::equijoin_on_clause<EquiJoin, Tuples...>(query);
+        if(EquiJoin)
+            detail::equijoin_relation_list<Join, Tuples...>(query);
+        else
+            detail::relation_list<Join, Tuples...>(query);
+        //if(sizeof...(Tuples) > 1)
+            //detail::equijoin_on_clause<EquiJoin, Tuples...>(query);
         query << " " << filter_.clause();
 
 #ifdef HADES_ENABLE_DEBUGGING

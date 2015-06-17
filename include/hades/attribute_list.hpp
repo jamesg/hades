@@ -206,7 +206,14 @@ namespace hades
         template<int Index, const char *Attr>
         static void retrieve_values_(sqlite3_stmt *stmt, styx::object& out)
         {
-            if(sqlite3_column_type(stmt, Index) == SQLITE_NULL)
+            // OUTER JOINs can retrieve the same column name from different
+            // tables.  The column may be NULL in tables that occur on the
+            // right of a LEFT OUTER JOIN.  If a NULL is retrieved, do not
+            // overwrite a previous value.
+            if(
+                    sqlite3_column_type(stmt, Index) == SQLITE_NULL &&
+                    out.has_key(Attr)
+                    )
                 return;
             std::string s;
             hades::get_column(stmt, Index, s);
