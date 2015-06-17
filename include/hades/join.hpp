@@ -57,7 +57,7 @@ namespace hades
         void equijoin_relation_list_(std::ostream& os)
         {
             os << Join << " " << RelationLast::relation_name << " ON ";
-            RelationBase::attribute_list_type::template equijoin_on_clause<
+            RelationBase::key_attribute_list::template equijoin_on_clause<
                 (const char*)RelationBase::relation_name,
                 (const char*)RelationLast::relation_name>(os);
         }
