@@ -35,9 +35,39 @@ template<typename T> T styx::object::copy(const std::string &k) const
     return get_default<T>();
 }
 
+double styx::object::copy_double(const std::string& s) const
+{
+    return copy<double>(s);
+}
+
+int styx::object::copy_int(const std::string& s) const
+{
+    return copy<int>(s);
+}
+
+styx::list styx::object::copy_list(const std::string& s) const
+{
+    return copy<list>(s);
+}
+
 std::string styx::object::copy_string(const std::string& s) const
 {
     return copy<std::string>(s);
+}
+
+styx::object styx::object::copy_object(const std::string& s) const
+{
+    return copy<object>(s);
+}
+
+styx::element styx::object::copy_element(const std::string& s) const
+{
+    return copy<element>(s);
+}
+
+bool styx::object::copy_bool(const std::string& s) const
+{
+    return copy<bool>(s);
 }
 
 template bool& styx::object::get<bool&>(const std::string&);

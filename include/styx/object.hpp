@@ -5,6 +5,7 @@
 #include <string>
 
 #include "styx/element.hpp"
+#include "styx/list.hpp"
 
 namespace styx
 {
@@ -61,7 +62,13 @@ namespace styx
 
         template<typename T> T copy(const std::string& k) const;
 
+        double copy_double(const std::string& k) const;
+        int copy_int(const std::string& k) const;
+        list copy_list(const std::string& k) const;
         std::string copy_string(const std::string& k) const;
+        object copy_object(const std::string& k) const;
+        element copy_element(const std::string& k) const;
+        bool copy_bool(const std::string& k) const;
 
         double& get_double(const std::string &k)
         {
