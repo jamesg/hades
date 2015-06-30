@@ -48,5 +48,5 @@ template int& styx::list::get<int>(styx::list::size_type);
 template double& styx::list::get<double>(styx::list::size_type);
 template std::string& styx::list::get<std::string>(styx::list::size_type);
 template styx::list& styx::list::get<styx::list>(styx::list::size_type);
+template styx::object& styx::list::get<styx::object>(styx::list::size_type);
 template styx::element& styx::list::get<styx::element>(styx::list::size_type);
-
