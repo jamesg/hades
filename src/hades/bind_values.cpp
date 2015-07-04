@@ -25,7 +25,7 @@ void hades::bind_any(int index, const styx::element& element, sqlite3_stmt *stmt
             hades::bind(index, s, stmt);
         }
 
-        void operator()(const int& i) const
+        void operator()(const styx::int_type& i) const
         {
             hades::bind(index, i, stmt);
         }
@@ -37,7 +37,7 @@ void hades::bind_any(int index, const styx::element& element, sqlite3_stmt *stmt
 
         void operator()(const bool& b) const
         {
-            hades::bind(index, static_cast<int>(b), stmt);
+            hades::bind(index, static_cast<styx::int_type>(b), stmt);
         }
 
         void operator()(const styx::list& o) const
@@ -76,7 +76,7 @@ void hades::bind(int index, const double value, sqlite3_stmt *stmt)
             mkstr() << "binding double " << value << " to index " << index
             );
 }
-void hades::bind(int index, const int value, sqlite3_stmt *stmt)
+void hades::bind(int index, const styx::int_type value, sqlite3_stmt *stmt)
 {
     if(sqlite3_bind_int(stmt, index, value) != SQLITE_OK)
         throw hades::exception(

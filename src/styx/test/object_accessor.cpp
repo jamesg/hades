@@ -24,15 +24,15 @@ SCENARIO("styx::object::get") {
             // Note: this would not have worked with 'auto s =
             // o.get_string("key");'.
             THEN("the string cannot be cast to an integer") {
-                REQUIRE_THROWS(o.get<int>("key"));
+                REQUIRE_THROWS(o.get<styx::int_type>("key"));
             }
         }
 
         WHEN("the value of the integer is updated") {
-            int& n = o.get_int("int");
+            styx::int_type& n = o.get_int("int");
             n = 5;
             THEN("the value was updated in the object") {
-                REQUIRE(o.get<int>("int") == 5);
+                REQUIRE(o.get<styx::int_type>("int") == 5);
             }
             THEN("the integer can be accessed as a string") {
                 std::string& s = o.get_string("int");

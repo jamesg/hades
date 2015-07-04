@@ -53,7 +53,7 @@ namespace hades
             {
             }
 
-            int& site_id()
+            styx::int_type& site_id()
             {
                 return key<attr::site_id>();
             }
@@ -99,12 +99,12 @@ namespace hades
             {
             }
 
-            int& site_id()
+            styx::int_type& site_id()
             {
                 return key<attr::site_id>();
             }
 
-            int& device_id()
+            styx::int_type& device_id()
             {
                 return key<attr::device_id>();
             }

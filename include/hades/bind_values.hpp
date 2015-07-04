@@ -28,7 +28,7 @@ namespace hades
 
     void bind(int index, const std::string& s, sqlite3_stmt *stmt);
     void bind(int index, const double value, sqlite3_stmt *stmt);
-    void bind(int index, const int value, sqlite3_stmt *stmt);
+    void bind(int index, const styx::int_type value, sqlite3_stmt *stmt);
     void bind_null(int index, sqlite3_stmt *stmt);
     /*!
      * \brief Bind a BLOB to a SQLite statement.

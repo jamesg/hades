@@ -103,7 +103,7 @@ styx::element styx::parser::parse_token()
             // Final case, try parsing an int.
             try
             {
-                return boost::lexical_cast<int>(std::string(start, end));
+                return boost::lexical_cast<styx::int_type>(std::string(start, end));
             }
             catch(const boost::bad_lexical_cast&)
             {

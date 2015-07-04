@@ -13,7 +13,7 @@ namespace hades
         class has_key_attr;
 
         template<typename DbType, const char *Attribute>
-        typename std::enable_if<std::is_base_of<has_key_attr<Attribute>, DbType>::value, int&>::type
+        typename std::enable_if<std::is_base_of<has_key_attr<Attribute>, DbType>::value, styx::int_type&>::type
         get_key(DbType& db)
         {
             return db.get_int(Attribute);

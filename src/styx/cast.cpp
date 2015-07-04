@@ -34,7 +34,7 @@ template styx::list styx::cast<styx::list>(const styx::element&);
 template styx::object styx::cast<styx::object>(const styx::element&);
 template bool styx::cast<bool>(const styx::element&);
 template double styx::cast<double>(const styx::element&);
-template int styx::cast<int>(const styx::element&);
+template styx::int_type styx::cast<styx::int_type>(const styx::element&);
 template std::string styx::cast<std::string>(const styx::element&);
 
 template styx::element styx::cast<styx::element>(const styx::element&);

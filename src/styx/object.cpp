@@ -40,9 +40,9 @@ double styx::object::copy_double(const std::string& s) const
     return copy<double>(s);
 }
 
-int styx::object::copy_int(const std::string& s) const
+styx::int_type styx::object::copy_int(const std::string& s) const
 {
-    return copy<int>(s);
+    return copy<styx::int_type>(s);
 }
 
 styx::list styx::object::copy_list(const std::string& s) const
@@ -72,21 +72,21 @@ bool styx::object::copy_bool(const std::string& s) const
 
 template bool& styx::object::get<bool&>(const std::string&);
 template double& styx::object::get<double&>(const std::string&);
-template int& styx::object::get<int&>(const std::string&);
+template styx::int_type& styx::object::get<styx::int_type&>(const std::string&);
 template std::string& styx::object::get<std::string&>(const std::string&);
 template styx::list& styx::object::get<styx::list&>(const std::string&);
 template styx::object& styx::object::get<styx::object&>(const std::string&);
 
 template bool styx::object::get<bool>(const std::string&);
 template double styx::object::get<double>(const std::string&);
-template int styx::object::get<int>(const std::string&);
+template styx::int_type styx::object::get<styx::int_type>(const std::string&);
 template std::string styx::object::get<std::string>(const std::string&);
 template styx::list styx::object::get<styx::list>(const std::string&);
 template styx::object styx::object::get<styx::object>(const std::string&);
 
 template bool styx::object::copy<bool>(const std::string&) const;
 template double styx::object::copy<double>(const std::string&) const;
-template int styx::object::copy<int>(const std::string&) const;
+template styx::int_type styx::object::copy<styx::int_type>(const std::string&) const;
 template std::string styx::object::copy<std::string>(const std::string&) const;
 template styx::list styx::object::copy<styx::list>(const std::string&) const;
 template styx::object styx::object::copy<styx::object>(const std::string&) const;

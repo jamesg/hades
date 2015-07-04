@@ -6,6 +6,8 @@
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/fusion/include/vector.hpp>
 
+#include "styx/atom.hpp"
+
 namespace hades
 {
     /*!
@@ -55,7 +57,7 @@ namespace hades
      * \param N arity of the row.
      */
     template<int N> using int_row =
-        typename detail::extend_row<N, int>::type;
+        typename detail::extend_row<N, styx::int_type>::type;
 
     /*!
      * \brief Get the value of a column from a row.  The index of the column is

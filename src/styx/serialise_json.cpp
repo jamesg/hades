@@ -68,7 +68,7 @@ std::string styx::serialise_json(const element &jobj)
             output_stream << oss.str();
         }
 
-        void operator()(const int& d) const
+        void operator()(const styx::int_type& d) const
         {
             std::ostringstream oss;
             oss << d;

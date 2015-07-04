@@ -54,7 +54,7 @@ SCENARIO("hades::filter::and_") {
                         ),
                     hades::where(
                         "site_id = ?",
-                        hades::row<int>(s1.site_id())
+                        hades::row<styx::int_type>(s1.site_id())
                         )
                     );
             THEN("site 1 is returned") {

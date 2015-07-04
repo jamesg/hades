@@ -27,7 +27,7 @@ namespace
     struct site :
         public hades::relation<relvar::site>,
         public hades::tuple<attribute::site::site_id, attribute::site::name>,
-        public hades::type_list<int, std::string>,
+        public hades::type_list<styx::int_type, std::string>,
         public hades::has_candidate_key<attribute::site::site_id>
     {
         site(styx::element& o) :
@@ -35,7 +35,7 @@ namespace
         {
         }
 
-        int& site_id()
+        styx::int_type& site_id()
         {
             return key<attribute::site::site_id>();
         }

@@ -17,9 +17,9 @@ namespace
             to = from;
             return true;
         }
-        bool operator()(const double& from, int& to) const
+        bool operator()(const double& from, styx::int_type& to) const
         {
-            to = static_cast<int>(from);
+            to = static_cast<styx::int_type>(from);
             return true;
         }
         bool operator()(const double& from, std::string& to) const
@@ -47,45 +47,45 @@ namespace
             return false;
         }
 
-        bool operator()(const int& from, double& to) const
+        bool operator()(const styx::int_type& from, double& to) const
         {
-            to = static_cast<int>(from);
+            to = static_cast<styx::int_type>(from);
             return true;
         } //< loss of precision
-        bool operator()(const int& from, int& to) const
+        bool operator()(const styx::int_type& from, styx::int_type& to) const
         {
             to = from;
             return true;
         }
-        bool operator()(const int& from, std::string& to) const
+        bool operator()(const styx::int_type& from, std::string& to) const
         {
             std::ostringstream oss;
             oss << from;
             to = oss.str();
             return true;
         }
-        bool operator()(const int&, styx::object&) const
+        bool operator()(const styx::int_type&, styx::object&) const
         {
             return false;
         }
-        bool operator()(const int&, styx::list&) const
+        bool operator()(const styx::int_type&, styx::list&) const
         {
             return false;
         }
-        bool operator()(const int& from, styx::null_t& to) const
+        bool operator()(const styx::int_type& from, styx::null_t& to) const
         {
             to = styx::get_default<styx::null_t>();
             return true;
         }
-        bool operator()(const int& from, bool& to) const
+        bool operator()(const styx::int_type& from, bool& to) const
         {
             to = (from > 0);
             return true;
         }
 
-        bool operator()(const std::string& from, int& to) const
+        bool operator()(const std::string& from, styx::int_type& to) const
         {
-            to = boost::lexical_cast<int>(from);
+            to = boost::lexical_cast<styx::int_type>(from);
             return true;
         }
         bool operator()(const std::string& from, double& to) const
@@ -120,7 +120,7 @@ namespace
             return false;
         }
 
-        bool operator()(const styx::object&, int&) const
+        bool operator()(const styx::object&, styx::int_type&) const
         {
             return false;
         }
@@ -164,7 +164,7 @@ namespace
             return false;
         }
 
-        bool operator()(const styx::list&, int&) const
+        bool operator()(const styx::list&, styx::int_type&) const
         {
             return false;
         }
@@ -199,9 +199,9 @@ namespace
             to = styx::get_default<double>();
             return true;
         }
-        bool operator()(const styx::null_t&, int& to) const
+        bool operator()(const styx::null_t&, styx::int_type& to) const
         {
-            to = styx::get_default<int>();
+            to = styx::get_default<styx::int_type>();
             return true;
         }
         bool operator()(const styx::null_t&, std::string& to) const
@@ -234,7 +234,7 @@ namespace
         {
             return false;
         }
-        bool operator()(const bool& from, int& to) const
+        bool operator()(const bool& from, styx::int_type& to) const
         {
             return false;
         }

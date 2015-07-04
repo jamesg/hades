@@ -136,7 +136,7 @@ void hades::crud<Tuple>::insert(connection& conn)
 
         try
         {
-            hades::bind(1, last_id, last_id_stmt);
+            hades::bind(1, (styx::int_type)last_id, last_id_stmt);
         }
         catch(const std::exception& e)
         {

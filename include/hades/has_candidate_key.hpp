@@ -91,7 +91,7 @@ namespace hades
              * key.
              */
             template<const char *Attribute_>
-            int& key()
+            styx::int_type& key()
             {
                 return detail::get_key<has_candidate_key<Attributes...>, Attribute_>(*this);
             }

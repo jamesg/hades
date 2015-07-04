@@ -112,7 +112,7 @@ namespace hades
         hades::int_row<arity> to_int_row() const
         {
             hades::int_row<arity> out;
-            copy_to_row<int>(out);
+            copy_to_row<styx::int_type>(out);
             return out;
         }
         /*!
@@ -176,9 +176,9 @@ namespace hades
             return get_attr<Attr, double>();
         }
         template<const char *Attr>
-        int& get_int()
+        styx::int_type& get_int()
         {
-            return get_attr<Attr, int>();
+            return get_attr<Attr, styx::int_type>();
         }
         template<const char *Attr>
         std::string& get_string()
@@ -197,9 +197,9 @@ namespace hades
             return copy_attr<Attr, double>();
         }
         template<const char *Attr>
-        int copy_int() const
+        styx::int_type copy_int() const
         {
-            return copy_attr<Attr, int>();
+            return copy_attr<Attr, styx::int_type>();
         }
         template<const char *Attr>
         std::string copy_string() const

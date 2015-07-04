@@ -39,7 +39,7 @@ namespace
             styx::object(o)
         {
         }
-        int& site_id()
+        styx::int_type& site_id()
         {
             return key<attribute::site_id>();
         }
@@ -61,11 +61,11 @@ namespace
             styx::object(o)
         {
         }
-        int& site_id()
+        styx::int_type& site_id()
         {
             return key<attribute::site_id>();
         }
-        int& device_id()
+        styx::int_type& device_id()
         {
             return key<attribute::device_id>();
         }

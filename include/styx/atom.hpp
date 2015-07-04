@@ -7,6 +7,7 @@
 
 namespace styx
 {
+    typedef long int int_type;
     /*!
      * \brief Any 'atomic' JSON type.  The type cannot be divided into other
      * JSON types.
@@ -15,7 +16,7 @@ namespace styx
         null_t,
         std::string,
         double,
-        int,
+        int_type,
         bool>
         atom;
 }

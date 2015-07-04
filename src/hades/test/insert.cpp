@@ -35,7 +35,7 @@ namespace
         {
         }
 
-        int& site_id()
+        styx::int_type& site_id()
         {
             return get_int<attribute::site_id>();
         }

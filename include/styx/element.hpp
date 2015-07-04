@@ -3,6 +3,7 @@
 
 #include <boost/variant.hpp>
 
+#include "styx/atom.hpp"
 #include "styx/null.hpp"
 
 namespace styx
@@ -25,7 +26,7 @@ namespace styx
         std::string,
         r_list,
         double,
-        int,
+        int_type,
         bool>
         element;
 

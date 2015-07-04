@@ -63,7 +63,7 @@ namespace styx
         template<typename T> T copy(const std::string& k) const;
 
         double copy_double(const std::string& k) const;
-        int copy_int(const std::string& k) const;
+        int_type copy_int(const std::string& k) const;
         list copy_list(const std::string& k) const;
         std::string copy_string(const std::string& k) const;
         object copy_object(const std::string& k) const;
@@ -74,9 +74,9 @@ namespace styx
         {
             return get<double&>(k);
         }
-        int& get_int(const std::string &k)
+        int_type& get_int(const std::string &k)
         {
-            return get<int&>(k);
+            return get<int_type&>(k);
         }
         list& get_list(const std::string &k)
         {
