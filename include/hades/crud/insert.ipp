@@ -34,26 +34,35 @@ void hades::crud<Tuple>::insert(connection& conn)
     Tuple& t = static_cast<Tuple&>(*this);
     {
         std::ostringstream query;
-        query << "INSERT INTO " << Tuple::relation_name << " ( ";
+
         auto attributes = t.value_attributes();
-        styx::serialise(
-                attributes,
-                [](const char *s, std::ostream& os) {
-                    os << s;
-                },
-                ", ",
-                query
-                );
-        query << " ) VALUES ( ";
-        styx::serialise(
-                attributes,
-                [](const char *, std::ostream& os) {
-                    os << "?";
-                },
-                ", ",
-                query
-                );
-        query << ")";
+        if(attributes.size() == 0)
+        {
+            query << "INSERT INTO " << Tuple::relation_name <<
+                " DEFAULT VALUES";
+        }
+        else
+        {
+            query << "INSERT INTO " << Tuple::relation_name << " ( ";
+            styx::serialise(
+                    attributes,
+                    [](const char *s, std::ostream& os) {
+                        os << s;
+                    },
+                    ", ",
+                    query
+                    );
+            query << " ) VALUES ( ";
+            styx::serialise(
+                    attributes,
+                    [](const char *, std::ostream& os) {
+                        os << "?";
+                    },
+                    ", ",
+                    query
+                    );
+            query << ")";
+        }
 
 #ifdef HADES_ENABLE_DEBUGGING
         std::cerr << "hades insert query: " << query.str() << std::endl;
@@ -176,4 +185,3 @@ void hades::crud<Tuple>::insert(connection& conn)
 }
 
 #endif
-
