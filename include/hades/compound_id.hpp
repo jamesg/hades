@@ -38,8 +38,8 @@ namespace hades
                      const char *...Keys
                      >
         void copy_id_list(
-                std::initializer_list<int>::iterator i,
-                std::initializer_list<int>::iterator end,
+                std::initializer_list<styx::int_type>::iterator i,
+                std::initializer_list<styx::int_type>::iterator end,
                 CompoundIdMap& out
                 )
         {
@@ -57,8 +57,8 @@ namespace hades
          */
         template<typename CompoundIdMap, const char *Key1>
         void copy_id_list(
-                std::initializer_list<int>::iterator i,
-                std::initializer_list<int>::iterator end,
+                std::initializer_list<styx::int_type>::iterator i,
+                std::initializer_list<styx::int_type>::iterator end,
                 CompoundIdMap& out
                 )
         {
@@ -96,7 +96,7 @@ namespace hades
         {
         }
 
-        compound_id(std::initializer_list<int> values)
+        compound_id(std::initializer_list<styx::int_type> values)
         {
             detail::copy_id_list<compound_id<Keys...>, Keys...>(
                     values.begin(),
@@ -131,7 +131,8 @@ namespace hades
                     id
                     );
 #ifdef HADES_ENABLE_DEBUGGING
-            std::cerr << "hades::compound_id::from_stmt id " << styx::serialise_json(id) << std::endl;
+            std::cerr << "hades::compound_id::from_stmt id " <<
+                styx::serialise_json(id) << std::endl;
 #endif
             return id;
         }
@@ -237,4 +238,3 @@ namespace hades
 }
 
 #endif
-
