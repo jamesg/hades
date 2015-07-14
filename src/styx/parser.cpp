@@ -2,6 +2,7 @@
 #include "styx/styx.hpp"
 
 #include <boost/lexical_cast.hpp>
+#include <sstream>
 
 #include "styx/exception.hpp"
 #include "styx/list.hpp"
@@ -30,6 +31,16 @@ void styx::parser::reset()
     m_cursor = 0;
     m_tokens_filled = 0;
     jsmn_init(&m_parser);
+}
+
+styx::element styx::parser::parse(std::istream& in)
+{
+    reset();
+    std::ostringstream oss;
+    for(std::string line; std::getline(in, line);)
+        oss << line << "\n";
+    std::string data = oss.str();
+    return parse(data.c_str(), data.size());
 }
 
 styx::element styx::parser::parse(const char *buf, size_t len)
@@ -138,4 +149,3 @@ styx::element styx::parser::parse_token()
     }
     return styx::null_t();
 }
-

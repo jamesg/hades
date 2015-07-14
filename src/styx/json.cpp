@@ -1,5 +1,6 @@
 #include "styx/styx.hpp"
 
+#include <fstream>
 #include <sstream>
 #include <stdexcept>
 
@@ -34,3 +35,14 @@ styx::element styx::parse_json(const std::string& str)
     return p.parse(str.c_str(), str.length());
 }
 
+styx::element styx::parse_json(std::istream& in)
+{
+    parser p;
+    return p.parse(in);
+}
+
+styx::element styx::parse_json_file(const std::string& filename)
+{
+    std::ifstream is(filename);
+    return parse_json(is);
+}

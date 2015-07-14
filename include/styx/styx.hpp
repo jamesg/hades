@@ -19,7 +19,13 @@ namespace styx
      * \throws Nothing.
      */
     styx::element parse_json(const std::string&);
+
+    // Parse the input from an input stream.  The stream is read until it is
+    // empty.
+    styx::element parse_json(std::istream&);
+
+    // Open a file and parse the contents.
+    styx::element parse_json_file(const std::string& filename);
 }
 
 #endif
-

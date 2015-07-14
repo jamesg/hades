@@ -14,7 +14,11 @@ namespace styx
         public:
             parser();
 
+            // Parse a string held in memory.
             styx::element parse(const char *buf, size_t len);
+
+            // Parse the input from an input stream.
+            styx::element parse(std::istream&);
 
         private:
             void reset();
@@ -50,4 +54,3 @@ namespace styx
 }
 
 #endif
-
