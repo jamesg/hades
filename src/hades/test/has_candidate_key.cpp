@@ -12,17 +12,12 @@ namespace
     struct device :
         public hades::has_candidate_key<device_id_cstr, site_id_cstr>
     {
-        device(styx::element& o) :
-            styx::object(o)
-        {
-        }
     };
 }
 
 SCENARIO("device id") {
     GIVEN("a new device") {
-        styx::element o;
-        device d(o);
+        device d;
         WHEN("the device id is set") {
             d.key<device_id_cstr>() = 1;
             THEN("the device id can be read") {
@@ -43,6 +38,12 @@ SCENARIO("device id") {
                 REQUIRE(d.key<site_id_cstr>() == 2);
             }
         }
+        WHEN("the id is removed") {
+            d.remove_id();
+            THEN("the id is not set") {
+                REQUIRE(!d.has_key(device_id_cstr));
+                REQUIRE(!d.has_key(site_id_cstr));
+            }
+        }
     }
 }
-
