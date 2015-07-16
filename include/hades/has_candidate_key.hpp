@@ -107,6 +107,11 @@ namespace hades
                 attribute_list<Attributes...>::copy_attributes(key, *this);
             }
 
+            void remove_id()
+            {
+                attribute_list<Attributes...>::unset(*this);
+            }
+
             template<int Start=1>
             void bind_key_values(sqlite3_stmt *stmt)
             {
@@ -139,4 +144,3 @@ namespace hades
 }
 
 #endif
-

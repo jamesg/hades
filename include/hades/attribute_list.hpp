@@ -115,6 +115,11 @@ namespace hades
             copy_attributes_<Attributes...>(from, to);
         }
 
+        static void unset(styx::object& o)
+        {
+            unset_<Attributes...>(o);
+        }
+
         template<const char *Relation1, const char *Relation2>
         static void equijoin_on_clause(std::ostream& out)
         {
@@ -252,6 +257,22 @@ namespace hades
             to.get_element(Attr) = from.get_element(Attr);
         }
 
+        template<const char *Attr1, const char *Attr2, const char *...Attrs>
+        static void unset_(styx::object& o)
+        {
+            unset_<Attr1>(o);
+            unset_<Attr2, Attrs...>(o);
+        }
+
+        template<const char *Attr>
+        static void unset_(styx::object& o)
+        {
+#ifdef HADES_ENABLE_DEBUGGING
+            std::cerr << "hades::attribute::unset_ attr: " << Attr << std::endl;
+#endif
+            o.erase(Attr);
+        }
+
         template<
             const char *Relation1,
             const char *Relation2,
@@ -359,4 +380,3 @@ namespace hades
 }
 
 #endif
-
