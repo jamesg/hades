@@ -2,11 +2,13 @@
 #define STYX_LIST_HPP
 
 #include <deque>
+#include <stdexcept>
 
 #include "styx/element.hpp"
 
 namespace styx
 {
+    class list_out_of_bounds_exception;
     /*!
      * \brief Simple list type based on std::deque.  Represents a polymorphic
      * list.
@@ -64,24 +66,37 @@ namespace styx
         {
             return elements.erase(first);
         }
-        //iterator erase(const_iterator first)
-        //{
-            //return elements.erase(first);
-        //}
         iterator erase(iterator first, iterator last)
         {
             return elements.erase(first, last);
         }
-        //iterator erase(const_iterator first, const_iterator last)
-        //{
-            //return elements.erase(first, last);
-        //}
         void push_back(const element& e) { elements.push_back(e); }
         void pop_back() { elements.pop_back(); }
         void push_front(const element& e) { elements.push_front(e); }
         void pop_front() { elements.pop_front(); }
     };
+
+    // An operation could not be completed because the list is empty (excluding
+    // cases where a specific index is requested, when
+    // list_out_of_bounds_exception is more appropriate).
+    class empty_list_exception : public std::exception
+    {
+    public:
+        const char *what() const noexcept override;
+    };
+    // An index outside of the list was requested.
+    class list_out_of_bounds_exception : public std::exception
+    {
+    public:
+        const char *what() const noexcept override;
+    };
+
+    // Get the first element of a list or throw an empty_list_exception.
+    element first(list&&);
+    // Get the first element of a list or throw an empty_list_exception.
+    const element& first(const list&);
+    // Get the first element of a list or throw an empty_list_exception.
+    element& first(list&);
 }
 
 #endif
-

@@ -44,6 +44,37 @@ T& styx::list::get(size_type k)
     return const_cast<T&>(boost::get<T>(elements.at(k)));
 }
 
+const char *styx::empty_list_exception::what() const noexcept
+{
+    return "empty list";
+}
+
+const char *styx::list_out_of_bounds_exception::what() const noexcept
+{
+    return "list index out of bounds";
+}
+
+styx::element styx::first(styx::list&& l)
+{
+    if(l.size() > 0)
+        return l.at(0);
+    throw empty_list_exception();
+}
+
+const styx::element& styx::first(const styx::list& l)
+{
+    if(l.size() > 0)
+        return l.at(0);
+    throw empty_list_exception();
+}
+
+styx::element& styx::first(styx::list& l)
+{
+    if(l.size() > 0)
+        return l[0];
+    throw empty_list_exception();
+}
+
 template styx::int_type& styx::list::get<styx::int_type>(styx::list::size_type);
 template double& styx::list::get<double>(styx::list::size_type);
 template std::string& styx::list::get<std::string>(styx::list::size_type);
