@@ -47,6 +47,11 @@ namespace hades
     {
         sqlite3_stmt *stmt = nullptr;
         sqlite3_prepare(db.handle(), query.c_str(), -1, &stmt, nullptr);
+        if(stmt == nullptr)
+            throw hades::exception(
+                mkstr() << "preparing SQL statement \"" << query << "\": " <<
+                    sqlite3_errmsg(db.handle())
+            );
         bind_values(values, stmt);
         int step_ret = sqlite3_step(stmt);
         int finalise_ret = sqlite3_finalize(stmt);
@@ -65,4 +70,3 @@ namespace hades
 }
 
 #endif
-
