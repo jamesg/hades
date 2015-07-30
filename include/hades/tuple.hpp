@@ -185,6 +185,20 @@ namespace hades
         {
             return get_attr<Attr, std::string>();
         }
+        /*!
+         * \brief Get the attribute named 'Attribute' from a tuple.
+         * \note Will only be instantiated if the tuple type inherits from
+         * has_attribute<Attribute>.
+         */
+        template<const char *Attribute>
+        typename std::enable_if<
+            std::is_base_of<detail::has_attribute<Attribute>, tuple<Attributes...>>::value,
+            styx::element&
+            >::type
+        get_element()
+        {
+            return get_element(Attribute);
+        }
 
         template<const char *Attr>
         bool copy_bool() const
@@ -378,4 +392,3 @@ namespace hades
 }
 
 #endif
-
