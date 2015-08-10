@@ -266,25 +266,9 @@ namespace hades
         // by all_column_list<Tuple>.
         //
 
-        struct arity_one
-        {
-            static constexpr const size_t value = 1;
-        };
-        template<typename Tuple>
-        struct arity_copy
-        {
-            static constexpr const size_t value = Tuple::arity;
-        };
         template<typename Tuple>
         struct arity
         {
-            //typedef typename std::conditional<
-                //std::is_base_of<detail::basic_flag, Tuple>::value,
-                //arity_one,
-                //arity_copy<Tuple>
-                //>::type arity_type;
-            //static constexpr const size_t value = arity_type::value;
-
             static constexpr const size_t value = hades::conditional_value<
                     size_t,
                     std::is_base_of<detail::basic_flag, Tuple>::value,
@@ -411,8 +395,6 @@ namespace hades
             detail::equijoin_relation_list<Join, Tuple, Tuples...>(query);
         else
             detail::on_relation_list<Join, Tuple, Tuples...>(clauses..., query);
-        //if(sizeof...(Tuples) > 1)
-            //detail::equijoin_on_clause<EquiJoin, Tuple, Tuples...>(query);
         query << " " << filter_.clause();
 
 #ifdef HADES_ENABLE_DEBUGGING
@@ -469,8 +451,6 @@ namespace hades
             detail::equijoin_relation_list<Join, Tuples...>(query);
         else
             detail::relation_list<Join, Tuples...>(query);
-        //if(sizeof...(Tuples) > 1)
-            //detail::equijoin_on_clause<EquiJoin, Tuples...>(query);
         query << " " << filter_.clause();
 
 #ifdef HADES_ENABLE_DEBUGGING
@@ -654,46 +634,6 @@ namespace hades
                 filter_
                 );
     }
-
-    // /*!
-    //  * \brief Execute an SQL SELECT query on multiple tables.  Tables are joined
-    //  * using an OUTER JOIN.  All attributes in all tables will be retrieved
-    //  * using a hades::relations_accessor.
-    //  *
-    //  * \returns A styx::list of styx::objects.  Objects contain all keys from
-    //  * all tuples in the join.
-    //  */
-    // template<typename ...Tuples>
-    // styx::list outer_join(connection& conn, const std::string& on)
-    // {
-    //     return join_on_<detail::join_type::outer, false, Tuples...>(
-    //             conn,
-    //             on,
-    //             filter_all()
-    //             );
-    // }
-    //
-    // /*!
-    //  * \brief Execute an SQL SELECT query on multiple tables.  Tables are joined
-    //  * using an OUTER JOIN.  All attributes in all tables will be retrieved
-    //  * using a hades::relations_accessor.
-    //  *
-    //  * \returns A styx::list of styx::objects.  Objects contain all keys from
-    //  * all tuples in the join.
-    //  */
-    // template<typename ...Tuples>
-    // styx::list outer_join(
-    //         connection& conn,
-    //         const std::string& on,
-    //         const basic_filter& filter_
-    //         )
-    // {
-    //     return join_on_<detail::join_type::outer, false, Tuples...>(
-    //             conn,
-    //             on,
-    //             filter_
-    //             );
-    // }
 }
 
 #endif
