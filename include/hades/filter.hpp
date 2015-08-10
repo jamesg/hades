@@ -57,7 +57,7 @@ namespace hades
                     m_values(values)
                 {
                 }
-                where(const std::string& clause_) :
+                explicit where(const std::string& clause_) :
                     m_clause(clause_),
                     m_values(hades::row<>())
                 {
@@ -245,4 +245,3 @@ namespace hades
 }
 
 #endif
-

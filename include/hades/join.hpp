@@ -23,6 +23,64 @@ namespace hades
 {
     namespace detail
     {
+        // Helper type to turn a list of tuple types into a list of std::string.
+        template<typename Tuple>
+        struct on_clause_string
+        {
+            typedef std::string type;
+        };
+
+        //
+        // on_relation_list: write a list of relation names and 'ON' clauses
+        // seperated by a join type to a stream.
+        //
+
+        template<const char *Join, typename Relation>
+        void on_relation_list_(
+            typename detail::on_clause_string<Relation>::type clause,
+            std::ostream& os
+            )
+        {
+            os << Relation::relation_name;
+            if(clause != "") {
+                os << " ON " << clause;
+            }
+        }
+
+        template<const char *Join, typename Relation1, typename Relation2, typename ...Relations>
+        void on_relation_list_(
+            typename detail::on_clause_string<Relation1>::type clause1,
+            typename detail::on_clause_string<Relation2>::type clause2,
+            typename detail::on_clause_string<Relations>::type... clauses,
+            std::ostream& os
+            )
+        {
+            os << Relation1::relation_name;
+            if(clause1 != "") {
+                os << " ON " << clause1;
+            }
+            os << Join;
+            on_relation_list_<Join, Relation2, Relations...>(clause2, clauses..., os);
+        }
+
+        template<const char *Join, typename Relation1, typename Relation2, typename ...Relations>
+        void on_relation_list(
+            typename detail::on_clause_string<Relation2>::type clause,
+            typename detail::on_clause_string<Relations>::type... clauses,
+            std::ostream& os
+            )
+        {
+            os << Relation1::relation_name;
+            os << Join;
+            on_relation_list_<Join, Relation2, Relations...>(clause, clauses..., os);
+        }
+
+        template<const char *Join, typename Relation1>
+        void on_relation_list(std::ostream& os)
+        {
+            os << Relation1::relation_name;
+        }
+
         //
         // relation_list: write a comma-separated list of relation names to a
         // stream.
@@ -336,23 +394,25 @@ namespace hades
      * \param Join Type of join (see namespace hades::detail::join_type).
      * \param Tuples Types inheriting from hades::tuple and hades::relation.
      * Determines the attributes and relation that will be queried.
-     * \param on String to be used as a SQL ON clause.
-     * \param filter SQL filter clause to use for the query.  Question mark
-     * placeholders are filled with values in 'values'.
+     * \param filter SQL filter clause to use for the query.
      */
-    template<const char *Join, bool SkipKeys, typename ...Tuples>
+    template<const char *Join, bool SkipKeys, bool EquiJoin, typename Tuple, typename ...Tuples>
     styx::list join_on_(
             connection& conn,
-            const std::string& on,
+            typename detail::on_clause_string<Tuples>::type... clauses,
             const basic_filter& filter_
             )
     {
         std::ostringstream query;
         query << "SELECT ";
-        detail::all_column_list<Tuples...>(query);
+        detail::all_column_list<Tuple, Tuples...>(query);
         query << " FROM ";
-        detail::relation_list<Join, Tuples...>(query);
-        query << " ON " << on;
+        if(EquiJoin)
+            detail::equijoin_relation_list<Join, Tuple, Tuples...>(query);
+        else
+            detail::on_relation_list<Join, Tuple, Tuples...>(clauses..., query);
+        //if(sizeof...(Tuples) > 1)
+            //detail::equijoin_on_clause<EquiJoin, Tuple, Tuples...>(query);
         query << " " << filter_.clause();
 
 #ifdef HADES_ENABLE_DEBUGGING
@@ -377,7 +437,7 @@ namespace hades
                     );
         }
         filter_.bind(stmt);
-        styx::list out = detail::fetch_join_result<SkipKeys, Tuples...>(stmt);
+        styx::list out = detail::fetch_join_result<SkipKeys, Tuple, Tuples...>(stmt);
         if(sqlite3_finalize(stmt) != SQLITE_OK)
             throw hades::exception("finalizing SQLite statement");
         return out;
@@ -560,11 +620,15 @@ namespace hades
      * \returns A styx::list of styx::objects.  Objects contain all keys from
      * all tuples in the join.
      */
-    template<typename ...Tuples>
-    styx::list outer_join(connection& conn)
+    template<typename Tuple, typename ...Tuples>
+    styx::list outer_join(
+            connection& conn,
+            typename detail::on_clause_string<Tuples>::type... clauses
+            )
     {
-        return join_<detail::join_type::outer, false, false, Tuples...>(
+        return join_on_<detail::join_type::outer, false, false, Tuple, Tuples...>(
                 conn,
+                clauses...,
                 filter_all()
                 );
     }
@@ -577,58 +641,59 @@ namespace hades
      * \returns A styx::list of styx::objects.  Objects contain all keys from
      * all tuples in the join.
      */
-    template<typename ...Tuples>
+    template<typename Tuple, typename ...Tuples>
     styx::list outer_join(
             connection& conn,
+            typename detail::on_clause_string<Tuples>::type... clauses,
             const basic_filter& filter_
             )
     {
-        return join_<detail::join_type::outer, false, false, Tuples...>(
+        return join_on_<detail::join_type::outer, false, false, Tuple, Tuples...>(
                 conn,
+                clauses...,
                 filter_
                 );
     }
 
-    /*!
-     * \brief Execute an SQL SELECT query on multiple tables.  Tables are joined
-     * using an OUTER JOIN.  All attributes in all tables will be retrieved
-     * using a hades::relations_accessor.
-     *
-     * \returns A styx::list of styx::objects.  Objects contain all keys from
-     * all tuples in the join.
-     */
-    template<typename ...Tuples>
-    styx::list outer_join(connection& conn, const std::string& on)
-    {
-        return join_on_<detail::join_type::outer, false, Tuples...>(
-                conn,
-                on,
-                filter_all()
-                );
-    }
-
-    /*!
-     * \brief Execute an SQL SELECT query on multiple tables.  Tables are joined
-     * using an OUTER JOIN.  All attributes in all tables will be retrieved
-     * using a hades::relations_accessor.
-     *
-     * \returns A styx::list of styx::objects.  Objects contain all keys from
-     * all tuples in the join.
-     */
-    template<typename ...Tuples>
-    styx::list outer_join(
-            connection& conn,
-            const std::string& on,
-            const basic_filter& filter_
-            )
-    {
-        return join_on_<detail::join_type::outer, false, Tuples...>(
-                conn,
-                on,
-                filter_
-                );
-    }
+    // /*!
+    //  * \brief Execute an SQL SELECT query on multiple tables.  Tables are joined
+    //  * using an OUTER JOIN.  All attributes in all tables will be retrieved
+    //  * using a hades::relations_accessor.
+    //  *
+    //  * \returns A styx::list of styx::objects.  Objects contain all keys from
+    //  * all tuples in the join.
+    //  */
+    // template<typename ...Tuples>
+    // styx::list outer_join(connection& conn, const std::string& on)
+    // {
+    //     return join_on_<detail::join_type::outer, false, Tuples...>(
+    //             conn,
+    //             on,
+    //             filter_all()
+    //             );
+    // }
+    //
+    // /*!
+    //  * \brief Execute an SQL SELECT query on multiple tables.  Tables are joined
+    //  * using an OUTER JOIN.  All attributes in all tables will be retrieved
+    //  * using a hades::relations_accessor.
+    //  *
+    //  * \returns A styx::list of styx::objects.  Objects contain all keys from
+    //  * all tuples in the join.
+    //  */
+    // template<typename ...Tuples>
+    // styx::list outer_join(
+    //         connection& conn,
+    //         const std::string& on,
+    //         const basic_filter& filter_
+    //         )
+    // {
+    //     return join_on_<detail::join_type::outer, false, Tuples...>(
+    //             conn,
+    //             on,
+    //             filter_
+    //             );
+    // }
 }
 
 #endif
-
